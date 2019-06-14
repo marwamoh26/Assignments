@@ -40,6 +40,17 @@ refine <- read.csv("refine_original.csv")
 Clean up the `company` column so all of the misspellings of the brand names are standardized. For example, you can transform the values in the column to be: *philips, akzo, van houten* and *unileve*r (all lowercase).
 
 ```{r}
+#Search for Approximate String Matching then replace the found ids with correct string
+idx <- agrep(pattern = "philips", x = refine$company, ignore.case = TRUE, value =   FALSE, max.distance = 3)
+ refine$company[idx] <- "philips"
+ idx <- agrep(pattern = "akzo", x = refine$company, ignore.case = TRUE, value = FALSE, max.distance = 2)
+ refine$company[idx] <- "akzo"
+ idx <- agrep(pattern = "van houten", x = refine$company, ignore.case = TRUE, value = FALSE, max.distance = 3)
+ refine$company[idx] <- "van houten"
+ idx <- agrep(pattern = "unilever", x = refine$company, ignore.case = TRUE, value = FALSE, max.distance = 3)
+ refine$company[idx] <- "unilever"
+ #drop unused levels
+ refine$company <- droplevels(refine$company)
 ```
 
 ### 2: Separate product code and number
