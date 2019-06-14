@@ -29,8 +29,7 @@ Using `R`, clean this data set to make it easier to visualize and analyze. Speci
 Save the data set as a CSV file called `refine_original.csv` and load it in RStudio into a data frame.
 
 ```{r}
-path <- "data/"
-setwd(path)
+
 refine <- read.csv("refine_original.csv")
 ```
 
@@ -78,6 +77,13 @@ You learn that the product codes actually represent the following product catego
 In order to make the data more readable, add a column with the product category for each record.
 
 ```{r}
+# x1 <- refine %>% filter(product_code == 'p') %>%  mutate(product_category = "Smartphone")
+# x2 <- refine %>% filter(product_code == 'v') %>%  mutate(product_category = "TV" )
+# x3 <- refine %>% filter(product_code == 'x') %>%  mutate(product_category = "Laptop")
+# x4 <- refine %>% filter(product_code == 'q') %>%  mutate(product_category = "Tablet" )
+#refine <- rbind(x1, x2, x3, x4)
+
+refine$product_category <- ifelse(refine$product_code == 'p', "Smartphone", ifelse(refine$product_code == 'v', "TV", if_else(refine$product_code == 'x', "Laptop", "Tablet")))
 ```
 
 ### 4: Add full address for geocoding
