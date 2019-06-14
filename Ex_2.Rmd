@@ -30,6 +30,7 @@ titanic <- read.csv("titanic_original.csv")
 The `embarked` column has some missing values, which are known to correspond to passengers who actually embarked at Southampton. Find the missing values and replace them with S. (Caution: Sometimes a missing value might be read into R as a blank or empty string.)
 
 ```{r}
+levels(titanic$embarked)[1] <- "S"
 ```
 
 ### 2: Age

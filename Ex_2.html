@@ -396,6 +396,7 @@ $(document).ready(function () {
 <div id="port-of-embarkation" class="section level3">
 <h3>1: Port of embarkation</h3>
 <p>The <code>embarked</code> column has some missing values, which are known to correspond to passengers who actually embarked at Southampton. Find the missing values and replace them with S. (Caution: Sometimes a missing value might be read into R as a blank or empty string.)</p>
+<pre class="r"><code>levels(titanic$embarked)[1] &lt;- &quot;S&quot;</code></pre>
 </div>
 <div id="age" class="section level3">
 <h3>2: Age</h3>
