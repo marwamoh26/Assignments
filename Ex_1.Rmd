@@ -58,6 +58,8 @@ idx <- agrep(pattern = "philips", x = refine$company, ignore.case = TRUE, value 
 Separate the product code and product number into separate columns i.e. add two new columns called `product_code` and `product_number`, containing the product code and number respectively
 
 ```{r}
+library(dplyr)
+refine <- refine %>% separate( Product.code...number, c("product_code", "product_number"), sep = "-")
 ```
 
 
