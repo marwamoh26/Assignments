@@ -51,6 +51,8 @@ titanic$age[is.na(titanic$age) | titanic$age == 0] <- mean(titanic$age, na.rm = 
 You’re interested in looking at the distribution of passengers in different `lifeboats`, but as we know, many passengers did not make it to a boat :-( This means that there are a lot of missing values in the `boat` column. Fill these empty slots with a dummy value e.g. the string *'None'* or *'NA'*
 
 ```{r}
+library(stringi)
+titanic$boat[stri_isempty(titanic$boat)] <- NA
 ```
 
 ### 4: Cabin

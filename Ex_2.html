@@ -409,6 +409,9 @@ titanic$age[is.na(titanic$age) | titanic$age == 0] &lt;- mean(titanic$age, na.rm
 <div id="lifeboat" class="section level3">
 <h3>3: Lifeboat</h3>
 <p>You’re interested in looking at the distribution of passengers in different <code>lifeboats</code>, but as we know, many passengers did not make it to a boat :-( This means that there are a lot of missing values in the <code>boat</code> column. Fill these empty slots with a dummy value e.g. the string <em>‘None’</em> or <em>‘NA’</em></p>
+<pre class="r"><code>library(stringi)</code></pre>
+<pre><code>## Warning: package &#39;stringi&#39; was built under R version 3.5.3</code></pre>
+<pre class="r"><code>titanic$boat[stri_isempty(titanic$boat)] &lt;- NA</code></pre>
 </div>
 <div id="cabin" class="section level3">
 <h3>4: Cabin</h3>
