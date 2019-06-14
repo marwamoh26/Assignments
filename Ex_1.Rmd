@@ -91,6 +91,7 @@ refine$product_category <- ifelse(refine$product_code == 'p', "Smartphone", ifel
 You'd like to view the customer information on a map. In order to do that, the addresses need to be in a form that can be easily geocoded. Create a new column `full_address` that concatenates the three address fields (`address`, `city`, `country`), separated by *commas*.
 
 ```{r}
+refine <- refine %>% unite("full_address", address, city, country, sep = ",")
 ```
 
 ### 5: Create dummy variables for company and product category
