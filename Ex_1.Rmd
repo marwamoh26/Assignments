@@ -29,6 +29,9 @@ Using `R`, clean this data set to make it easier to visualize and analyze. Speci
 Save the data set as a CSV file called `refine_original.csv` and load it in RStudio into a data frame.
 
 ```{r}
+path <- "data/"
+setwd(path)
+refine <- read.csv("refine_original.csv")
 ```
 
 
