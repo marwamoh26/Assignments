@@ -22,6 +22,7 @@ Using `R`, you’ll be handling missing values in this data set, and creating a 
 Save the data set `titanic3.xls` as a CSV file called `titanic_original.csv` and load it in RStudio into a data frame.
 
 ```{r}
+titanic <- read.csv("titanic_original.csv")
 ```
 
 ### 1: Port of embarkation
