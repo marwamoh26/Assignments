@@ -403,6 +403,8 @@ $(document).ready(function () {
 <p>You’ll notice that a lot of the values in the <code>Age</code> column are either missing or illogic. While there are many ways to fill these missing values, using the <em>mean</em> or <em>median</em> of the rest of the values is quite common in such cases.</p>
 <p>Calculate the mean of the Age column and use that value to populate the missing values</p>
 <p>Think about other ways you could have populated the missing values in the age column. Why would you pick any of those over the mean (or not)?</p>
+<pre class="r"><code>titanic$age &lt;- as.integer(titanic$age)
+titanic$age[is.na(titanic$age) | titanic$age == 0] &lt;- mean(titanic$age, na.rm = TRUE)</code></pre>
 </div>
 <div id="lifeboat" class="section level3">
 <h3>3: Lifeboat</h3>

@@ -42,6 +42,8 @@ Calculate the mean of the Age column and use that value to populate the missing 
 Think about other ways you could have populated the missing values in the age column. Why would you pick any of those over the mean (or not)?
 
 ```{r}
+titanic$age <- as.integer(titanic$age)
+titanic$age[is.na(titanic$age) | titanic$age == 0] <- mean(titanic$age, na.rm = TRUE)
 ```
 
 ### 3: Lifeboat
