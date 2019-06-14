@@ -66,5 +66,6 @@ You notice that many passengers don’t have a cabin number associated with them
 You have a hunch that the fact that the cabin number is missing might be a useful indicator of survival. Create a new column `has_cabin_number` which has *1* if there is a cabin number, and *0* otherwise.
 
 ```{r}
+titanic$has_cabin_number <- ifelse(!(stri_isempty(titanic$cabin)), 1, 0)
 ```
 

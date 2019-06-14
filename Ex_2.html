@@ -421,6 +421,7 @@ titanic$age[is.na(titanic$age) | titanic$age == 0] &lt;- mean(titanic$age, na.rm
 <li><p>What does a missing value here mean?</p></li>
 </ul>
 <p>You have a hunch that the fact that the cabin number is missing might be a useful indicator of survival. Create a new column <code>has_cabin_number</code> which has <em>1</em> if there is a cabin number, and <em>0</em> otherwise.</p>
+<pre class="r"><code>titanic$has_cabin_number &lt;- ifelse(!(stri_isempty(titanic$cabin)), 1, 0)</code></pre>
 </div>
 </div>
 
