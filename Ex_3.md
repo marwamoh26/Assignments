@@ -1,6 +1,6 @@
 Data Wrangling Exercise 3: Human Activity Recognition
 ================
-Mohammed Ali
+Mohammed Ali; Marwa Mohamed
 6/2/2019
 
 ## Overview

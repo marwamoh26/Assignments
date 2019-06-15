@@ -1,6 +1,6 @@
 Data Wrangling Exercise 1: Basic Data Manipulation
 ================
-Mohammed Ali
+Mohammed Ali; Marwa Mohamed
 6/2/2019
 
 ## Overview
