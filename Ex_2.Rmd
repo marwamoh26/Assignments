@@ -7,6 +7,8 @@ output: github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+# load needed packages and install them if they do not exist
+easypackages::packages("tidyverse", "stringi", "tidylog", prompt = F)
 ```
 
 ## Overview
@@ -22,7 +24,13 @@ Using `R`, you’ll be handling missing values in this data set, and creating a 
 Save the data set `titanic3.xls` as a CSV file called `titanic_original.csv` and load it in RStudio into a data frame.
 
 ```{r}
-titanic <- read.csv("titanic_original.csv")
+titanic <- read_csv("data/titanic_original.csv", col_types = "iiffniifnfffif")
+
+# Inspect data structure
+glimpse(titanic)
+
+# Inspect first 5 rows in loaded data
+head(titanic)
 ```
 
 ### 1: Port of embarkation
@@ -30,7 +38,14 @@ titanic <- read.csv("titanic_original.csv")
 The `embarked` column has some missing values, which are known to correspond to passengers who actually embarked at Southampton. Find the missing values and replace them with S. (Caution: Sometimes a missing value might be read into R as a blank or empty string.)
 
 ```{r}
-levels(titanic$embarked)[1] <- "S"
+# what is the status before processing
+table(is.na(titanic$embarked))
+
+# change missing values to s
+titanic$embarked[is.na(titanic$embarked)] <- "S"
+
+# after some cleaning
+table(is.na(titanic$embarked))
 ```
 
 ### 2: Age
@@ -42,8 +57,14 @@ Calculate the mean of the Age column and use that value to populate the missing 
 Think about other ways you could have populated the missing values in the age column. Why would you pick any of those over the mean (or not)?
 
 ```{r}
+# age before cleaning
+table(titanic$age)
+# convert age to integers
 titanic$age <- as.integer(titanic$age)
+# replace missing and zero values with mean
 titanic$age[is.na(titanic$age) | titanic$age == 0] <- mean(titanic$age, na.rm = TRUE)
+# After cleaning
+table(titanic$age)
 ```
 
 ### 3: Lifeboat
@@ -51,8 +72,14 @@ titanic$age[is.na(titanic$age) | titanic$age == 0] <- mean(titanic$age, na.rm = 
 You’re interested in looking at the distribution of passengers in different `lifeboats`, but as we know, many passengers did not make it to a boat :-( This means that there are a lot of missing values in the `boat` column. Fill these empty slots with a dummy value e.g. the string *'None'* or *'NA'*
 
 ```{r}
-library(stringi)
-titanic$boat[stri_isempty(titanic$boat)] <- NA
+# boat life before cleaning
+table(is.na(titanic$boat))
+# add none as factor to boat
+levels(titanic$boat) <- c(levels(titanic$boat), 'None')
+# replace missing boat life with NA
+titanic$boat[is.na(titanic$boat)] <- 'None'
+# After cleaning
+table(is.na(titanic$boat))
 ```
 
 ### 4: Cabin
@@ -66,6 +93,9 @@ You notice that many passengers don’t have a cabin number associated with them
 You have a hunch that the fact that the cabin number is missing might be a useful indicator of survival. Create a new column `has_cabin_number` which has *1* if there is a cabin number, and *0* otherwise.
 
 ```{r}
-titanic$has_cabin_number <- ifelse(!(stri_isempty(titanic$cabin)), 1, 0)
+# Add new column with 0 values for missing cabin number and 1 otherwise
+titanic$has_cabin_number <- ifelse(!(is.na(titanic$cabin)), 1, 0)
+# Inspect data structure
+glimpse(titanic)
 ```
 
