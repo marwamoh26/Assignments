@@ -8,7 +8,7 @@ output: github_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 # load needed packages and install them if they do not exist
-easypackages::packages("tidyverse", "dummies", "tidylog", prompt = F)
+easypackages::packages("tidyverse", "dummies", "tidylog", "fastDummies", prompt = F)
 ```
 
 ## Overview
@@ -131,7 +131,9 @@ In order to make the data more readable, add a column with the product category 
 # x4 <- refine %>% filter(product_code == 'q') %>%  mutate(product_category = "Tablet" )
 #refine <- rbind(x1, x2, x3, x4)
 
-# refine$product_category <- ifelse(refine$product_code == 'p', "Smartphone", ifelse(refine$product_code == 'v', "TV", if_else(refine$product_code == 'x', "Laptop", "Tablet")))
+# refine$product_category <- ifelse(refine$product_code == 'p',
+#"Smartphone", ifelse(refine$product_code == 'v', "TV", 
+#if_else(refine$product_code == 'x', "Laptop", "Tablet")))
 
 # even better ;)
 refine <- refine %>% 
@@ -161,7 +163,14 @@ Both the company name and product category are categorical variables i.e. they t
 - Add four binary (1 or 0) columns for product category: product_smartphone, product_tv, product_laptop and product_tablet.
 
 ```{r}
-names(refine)[6] <- "product"
-refine <- refine %>% dummy.data.frame(names = c("company", "product"), sep = '_')
+#names(refine)[6] <- "product"
+# use rename to avoid confusion
+refine <- refine %>%
+  rename(category = product_category)
+
+refine <-
+  refine %>% dummy_cols(select_columns  = c("company", "category"))
+
+glimpse(refine)
 ```
 

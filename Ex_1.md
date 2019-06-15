@@ -36,7 +36,7 @@ in RStudio into a data frame.
 
 ``` r
 # Use readr methods in your read/write operations
-refine <- read.csv("data/refine_original.csv")
+refine <- read_csv("data/refine_original.csv", col_types = "fccfff")
 
 # Inspect data structure
 glimpse(refine)
@@ -44,32 +44,27 @@ glimpse(refine)
 
     ## Observations: 25
     ## Variables: 6
-    ## $ company               <fct> Phillips, phillips, philips, phllips, ph...
-    ## $ Product.code...number <fct> p-5, p-43, x-3, x-34, x-12, p-23, v-43, ...
-    ## $ address               <fct> Groningensingel 147, Groningensingel 148...
-    ## $ city                  <fct> arnhem, arnhem, arnhem, arnhem, arnhem, ...
-    ## $ country               <fct> the netherlands, the netherlands, the ne...
-    ## $ name                  <fct> dhr p. jansen, dhr p. hansen, dhr j. Gan...
+    ## $ company                 <fct> Phillips, phillips, philips, phllips, ...
+    ## $ `Product code / number` <chr> "p-5", "p-43", "x-3", "x-34", "x-12", ...
+    ## $ address                 <chr> "Groningensingel 147", "Groningensinge...
+    ## $ city                    <fct> arnhem, arnhem, arnhem, arnhem, arnhem...
+    ## $ country                 <fct> the netherlands, the netherlands, the ...
+    ## $ name                    <fct> dhr p. jansen, dhr p. hansen, dhr j. G...
 
 ``` r
 # Inspect first 5 rows in loaded data
 head(refine)
 ```
 
-    ##    company Product.code...number             address   city
-    ## 1 Phillips                   p-5 Groningensingel 147 arnhem
-    ## 2 phillips                  p-43 Groningensingel 148 arnhem
-    ## 3  philips                   x-3 Groningensingel 149 arnhem
-    ## 4  phllips                  x-34 Groningensingel 150 arnhem
-    ## 5  phillps                  x-12 Groningensingel 151 arnhem
-    ## 6 phillipS                  p-23 Groningensingel 152 arnhem
-    ##           country            name
-    ## 1 the netherlands   dhr p. jansen
-    ## 2 the netherlands   dhr p. hansen
-    ## 3 the netherlands   dhr j. Gansen
-    ## 4 the netherlands   dhr p. mansen
-    ## 5 the netherlands  dhr p. fransen
-    ## 6 the netherlands dhr p. franssen
+    ## # A tibble: 6 x 6
+    ##   company  `Product code / num~ address        city  country     name      
+    ##   <fct>    <chr>                <chr>          <fct> <fct>       <fct>     
+    ## 1 Phillips p-5                  Groningensing~ arnh~ the nether~ dhr p. ja~
+    ## 2 phillips p-43                 Groningensing~ arnh~ the nether~ dhr p. ha~
+    ## 3 philips  x-3                  Groningensing~ arnh~ the nether~ dhr j. Ga~
+    ## 4 phllips  x-34                 Groningensing~ arnh~ the nether~ dhr p. ma~
+    ## 5 phillps  x-12                 Groningensing~ arnh~ the nether~ dhr p. fr~
+    ## 6 phillipS p-23                 Groningensing~ arnh~ the nether~ dhr p. fr~
 
 ### 1: Clean up brand names
 
@@ -79,18 +74,87 @@ column to be: *philips, akzo, van houten* and *unileve*r (all
 lowercase).
 
 ``` r
-#Search for Approximate String Matching then replace the found ids with correct string
-idx <- agrep(pattern = "philips", x = refine$company, ignore.case = TRUE, value =   FALSE, max.distance = 3)
- refine$company[idx] <- "philips"
- idx <- agrep(pattern = "akzo", x = refine$company, ignore.case = TRUE, value = FALSE, max.distance = 2)
- refine$company[idx] <- "akzo"
- idx <- agrep(pattern = "van houten", x = refine$company, ignore.case = TRUE, value = FALSE, max.distance = 3)
- refine$company[idx] <- "van houten"
- idx <- agrep(pattern = "unilever", x = refine$company, ignore.case = TRUE, value = FALSE, max.distance = 3)
- refine$company[idx] <- "unilever"
- #drop unused levels
- refine$company <- droplevels(refine$company)
+# what is the status before processing
+table(refine$company)
 ```
+
+    ## 
+    ##   Phillips   phillips    philips    phllips    phillps   phillipS 
+    ##          1          2          1          1          1          1 
+    ##       akzo       Akzo       AKZO       akz0      ak zo    fillips 
+    ##          3          1          1          1          1          1 
+    ##     phlips Van Houten van Houten van houten    unilver   unilever 
+    ##          1          2          1          2          1          2 
+    ##   Unilever 
+    ##          1
+
+``` r
+#Search for Approximate String Matching then replace the found ids with correct string
+idx <-
+  agrep(
+    pattern = "philips",
+    x = refine$company,
+    ignore.case = TRUE,
+    value =   FALSE,
+    max.distance = 3
+  )
+refine$company[idx] <- "philips"
+
+idx <-
+  agrep(
+    pattern = "akzo",
+    x = refine$company,
+    ignore.case = TRUE,
+    value = FALSE,
+    max.distance = 2
+  )
+refine$company[idx] <- "akzo"
+
+idx <-
+  agrep(
+    pattern = "van houten",
+    x = refine$company,
+    ignore.case = TRUE,
+    value = FALSE,
+    max.distance = 3
+  )
+refine$company[idx] <- "van houten"
+
+idx <-
+  agrep(
+    pattern = "unilever",
+    x = refine$company,
+    ignore.case = TRUE,
+    value = FALSE,
+    max.distance = 3
+  )
+refine$company[idx] <- "unilever"
+
+# what is the status now?
+table(refine$company)
+```
+
+    ## 
+    ##   Phillips   phillips    philips    phllips    phillps   phillipS 
+    ##          0          0          9          0          0          0 
+    ##       akzo       Akzo       AKZO       akz0      ak zo    fillips 
+    ##          7          0          0          0          0          0 
+    ##     phlips Van Houten van Houten van houten    unilver   unilever 
+    ##          0          0          0          5          0          4 
+    ##   Unilever 
+    ##          0
+
+``` r
+#drop unused levels
+refine$company <- droplevels(refine$company)
+
+# after some cleaning
+table(refine$company)
+```
+
+    ## 
+    ##    philips       akzo van houten   unilever 
+    ##          9          7          5          4
 
 ### 2: Separate product code and number
 
@@ -100,8 +164,19 @@ containing the product code and number
 respectively
 
 ``` r
-refine <- refine %>% separate( Product.code...number, c("product_code", "product_number"), sep = "-")
+refine <- refine %>% separate(`Product code / number`, c("product_code", "product_number"), sep = "-")
+glimpse(refine)
 ```
+
+    ## Observations: 25
+    ## Variables: 7
+    ## $ company        <fct> philips, philips, philips, philips, philips, ph...
+    ## $ product_code   <chr> "p", "p", "x", "x", "x", "p", "v", "v", "x", "p...
+    ## $ product_number <chr> "5", "43", "3", "34", "12", "23", "43", "12", "...
+    ## $ address        <chr> "Groningensingel 147", "Groningensingel 148", "...
+    ## $ city           <fct> arnhem, arnhem, arnhem, arnhem, arnhem, arnhem,...
+    ## $ country        <fct> the netherlands, the netherlands, the netherlan...
+    ## $ name           <fct> dhr p. jansen, dhr p. hansen, dhr j. Gansen, dh...
 
 ### 3: Add product categories
 
@@ -127,8 +202,35 @@ record.
 # x4 <- refine %>% filter(product_code == 'q') %>%  mutate(product_category = "Tablet" )
 #refine <- rbind(x1, x2, x3, x4)
 
-refine$product_category <- ifelse(refine$product_code == 'p', "Smartphone", ifelse(refine$product_code == 'v', "TV", if_else(refine$product_code == 'x', "Laptop", "Tablet")))
+# refine$product_category <- ifelse(refine$product_code == 'p',
+#"Smartphone", ifelse(refine$product_code == 'v', "TV", 
+#if_else(refine$product_code == 'x', "Laptop", "Tablet")))
+
+# even better ;)
+refine <- refine %>% 
+  mutate(product_category = case_when(product_code == "p" ~ "Smartphone",
+                                      product_code == "v" ~ "TV",
+                                      product_code == "x" ~ "Laptop",
+                                      product_code == "q" ~ "Tablet"),
+         product_category = factor(product_category, levels = c("Smartphone", "TV", "Laptop", "Tablet")))
 ```
+
+    ## mutate: new variable 'product_category' with 4 unique values and 0% NA
+
+``` r
+glimpse(refine)
+```
+
+    ## Observations: 25
+    ## Variables: 8
+    ## $ company          <fct> philips, philips, philips, philips, philips, ...
+    ## $ product_code     <chr> "p", "p", "x", "x", "x", "p", "v", "v", "x", ...
+    ## $ product_number   <chr> "5", "43", "3", "34", "12", "23", "43", "12",...
+    ## $ address          <chr> "Groningensingel 147", "Groningensingel 148",...
+    ## $ city             <fct> arnhem, arnhem, arnhem, arnhem, arnhem, arnhe...
+    ## $ country          <fct> the netherlands, the netherlands, the netherl...
+    ## $ name             <fct> dhr p. jansen, dhr p. hansen, dhr j. Gansen, ...
+    ## $ product_category <fct> Smartphone, Smartphone, Laptop, Laptop, Lapto...
 
 ### 4: Add full address for geocoding
 
@@ -140,7 +242,15 @@ fields (`address`, `city`, `country`), separated by
 
 ``` r
 refine <- refine %>% unite("full_address", address, city, country, sep = ",")
+head(refine$full_address)
 ```
+
+    ## [1] "Groningensingel 147,arnhem,the netherlands"
+    ## [2] "Groningensingel 148,arnhem,the netherlands"
+    ## [3] "Groningensingel 149,arnhem,the netherlands"
+    ## [4] "Groningensingel 150,arnhem,the netherlands"
+    ## [5] "Groningensingel 151,arnhem,the netherlands"
+    ## [6] "Groningensingel 152,arnhem,the netherlands"
 
 ### 5: Create dummy variables for company and product category
 
@@ -160,6 +270,30 @@ i.e.,
 <!-- end list -->
 
 ``` r
-names(refine)[6] <- "product"
-refine <- refine %>% dummy.data.frame(names = c("company", "product"), sep = '_')
+#names(refine)[6] <- "product"
+# use rename to avoid confusion
+refine <- refine %>%
+  rename(category = product_category)
+
+refine <-
+  refine %>% dummy_cols(select_columns  = c("company", "category"))
+
+glimpse(refine)
 ```
+
+    ## Observations: 25
+    ## Variables: 14
+    ## $ company              <fct> philips, philips, philips, philips, phili...
+    ## $ product_code         <chr> "p", "p", "x", "x", "x", "p", "v", "v", "...
+    ## $ product_number       <chr> "5", "43", "3", "34", "12", "23", "43", "...
+    ## $ full_address         <chr> "Groningensingel 147,arnhem,the netherlan...
+    ## $ name                 <fct> dhr p. jansen, dhr p. hansen, dhr j. Gans...
+    ## $ category             <fct> Smartphone, Smartphone, Laptop, Laptop, L...
+    ## $ company_philips      <int> 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1,...
+    ## $ company_akzo         <int> 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0,...
+    ## $ `company_van houten` <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
+    ## $ company_unilever     <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
+    ## $ category_Smartphone  <int> 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1,...
+    ## $ category_Laptop      <int> 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0,...
+    ## $ category_TV          <int> 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0,...
+    ## $ category_Tablet      <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0,...
