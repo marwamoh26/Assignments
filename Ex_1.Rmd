@@ -32,7 +32,7 @@ Save the data set as a CSV file called `refine_original.csv` and load it in RStu
 
 ```{r}
 
-refine <- read.csv("refine_original.csv")
+refine <- read.csv("data/refine_original.csv")
 ```
 
 
