@@ -131,7 +131,16 @@ In order to make the data more readable, add a column with the product category 
 # x4 <- refine %>% filter(product_code == 'q') %>%  mutate(product_category = "Tablet" )
 #refine <- rbind(x1, x2, x3, x4)
 
-refine$product_category <- ifelse(refine$product_code == 'p', "Smartphone", ifelse(refine$product_code == 'v', "TV", if_else(refine$product_code == 'x', "Laptop", "Tablet")))
+# refine$product_category <- ifelse(refine$product_code == 'p', "Smartphone", ifelse(refine$product_code == 'v', "TV", if_else(refine$product_code == 'x', "Laptop", "Tablet")))
+
+# even better ;)
+refine <- refine %>% 
+  mutate(product_category = case_when(product_code == "p" ~ "Smartphone",
+                                      product_code == "v" ~ "TV",
+                                      product_code == "x" ~ "Laptop",
+                                      product_code == "q" ~ "Tablet"),
+         product_category = factor(product_category, levels = c("Smartphone", "TV", "Laptop", "Tablet")))
+glimpse(refine)
 ```
 
 ### 4: Add full address for geocoding

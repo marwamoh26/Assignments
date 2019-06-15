@@ -35,8 +35,41 @@ Save the data set as a CSV file called `refine_original.csv` and load it
 in RStudio into a data frame.
 
 ``` r
-refine <- read.csv("refine_original.csv")
+# Use readr methods in your read/write operations
+refine <- read.csv("data/refine_original.csv")
+
+# Inspect data structure
+glimpse(refine)
 ```
+
+    ## Observations: 25
+    ## Variables: 6
+    ## $ company               <fct> Phillips, phillips, philips, phllips, ph...
+    ## $ Product.code...number <fct> p-5, p-43, x-3, x-34, x-12, p-23, v-43, ...
+    ## $ address               <fct> Groningensingel 147, Groningensingel 148...
+    ## $ city                  <fct> arnhem, arnhem, arnhem, arnhem, arnhem, ...
+    ## $ country               <fct> the netherlands, the netherlands, the ne...
+    ## $ name                  <fct> dhr p. jansen, dhr p. hansen, dhr j. Gan...
+
+``` r
+# Inspect first 5 rows in loaded data
+head(refine)
+```
+
+    ##    company Product.code...number             address   city
+    ## 1 Phillips                   p-5 Groningensingel 147 arnhem
+    ## 2 phillips                  p-43 Groningensingel 148 arnhem
+    ## 3  philips                   x-3 Groningensingel 149 arnhem
+    ## 4  phllips                  x-34 Groningensingel 150 arnhem
+    ## 5  phillps                  x-12 Groningensingel 151 arnhem
+    ## 6 phillipS                  p-23 Groningensingel 152 arnhem
+    ##           country            name
+    ## 1 the netherlands   dhr p. jansen
+    ## 2 the netherlands   dhr p. hansen
+    ## 3 the netherlands   dhr j. Gansen
+    ## 4 the netherlands   dhr p. mansen
+    ## 5 the netherlands  dhr p. fransen
+    ## 6 the netherlands dhr p. franssen
 
 ### 1: Clean up brand names
 
@@ -63,25 +96,10 @@ idx <- agrep(pattern = "philips", x = refine$company, ignore.case = TRUE, value 
 
 Separate the product code and product number into separate columns
 i.e. add two new columns called `product_code` and `product_number`,
-containing the product code and number respectively
+containing the product code and number
+respectively
 
 ``` r
-library(dplyr)
-```
-
-    ## 
-    ## Attaching package: 'dplyr'
-
-    ## The following objects are masked from 'package:stats':
-    ## 
-    ##     filter, lag
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     intersect, setdiff, setequal, union
-
-``` r
-library(tidyr)
 refine <- refine %>% separate( Product.code...number, c("product_code", "product_number"), sep = "-")
 ```
 
@@ -140,12 +158,6 @@ i.e.,
     product\_tablet.
 
 <!-- end list -->
-
-``` r
-library(dummies)
-```
-
-    ## dummies-1.5.6 provided by Decision Patterns
 
 ``` r
 names(refine)[6] <- "product"
