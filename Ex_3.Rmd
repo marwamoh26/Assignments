@@ -2,7 +2,7 @@
 title: 'Data Wrangling Exercise 3: Human Activity Recognition'
 author: "Mohammed Ali"
 date: "6/2/2019"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}

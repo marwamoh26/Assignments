@@ -2,7 +2,7 @@
 title: "Data Wrangling Exercise 1: Basic Data Manipulation"
 author: "Mohammed Ali"
 date: "6/2/2019"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
@@ -58,6 +58,7 @@ Separate the product code and product number into separate columns i.e. add two 
 
 ```{r}
 library(dplyr)
+library(tidyr)
 refine <- refine %>% separate( Product.code...number, c("product_code", "product_number"), sep = "-")
 ```
 
@@ -103,6 +104,7 @@ Both the company name and product category are categorical variables i.e. they t
 - Add four binary (1 or 0) columns for product category: product_smartphone, product_tv, product_laptop and product_tablet.
 
 ```{r}
+library(dummies)
 names(refine)[6] <- "product"
 refine <- refine %>% dummy.data.frame(names = c("company", "product"), sep = '_')
 ```
