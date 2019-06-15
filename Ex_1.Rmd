@@ -8,7 +8,7 @@ output: github_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 # load needed packages and install them if they do not exist
-easypackages::packages("tidyverse", "dummies", prompt = F)
+easypackages::packages("tidyverse", "dummies", "tidylog", prompt = F)
 ```
 
 ## Overview
@@ -106,6 +106,7 @@ Separate the product code and product number into separate columns i.e. add two 
 
 ```{r}
 refine <- refine %>% separate(`Product code / number`, c("product_code", "product_number"), sep = "-")
+glimpse(refine)
 ```
 
 
