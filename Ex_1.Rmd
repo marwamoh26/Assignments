@@ -30,9 +30,15 @@ Using `R`, clean this data set to make it easier to visualize and analyze. Speci
 
 Save the data set as a CSV file called `refine_original.csv` and load it in RStudio into a data frame.
 
-```{r}
+```{r, message=FALSE}
+# Use readr methods in your read/write operations
+refine <- read_csv("data/refine_original.csv", col_types = "fccfff")
 
-refine <- read.csv("data/refine_original.csv")
+# Inspect data structure
+glimpse(refine)
+
+# Inspect first 5 rows in loaded data
+head(refine)
 ```
 
 
@@ -59,7 +65,7 @@ idx <- agrep(pattern = "philips", x = refine$company, ignore.case = TRUE, value 
 Separate the product code and product number into separate columns i.e. add two new columns called `product_code` and `product_number`, containing the product code and number respectively
 
 ```{r}
-refine <- refine %>% separate( Product.code...number, c("product_code", "product_number"), sep = "-")
+refine <- refine %>% separate(`Product code / number`, c("product_code", "product_number"), sep = "-")
 ```
 
 
