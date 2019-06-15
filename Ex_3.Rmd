@@ -1,6 +1,6 @@
 ---
 title: 'Data Wrangling Exercise 3: Human Activity Recognition'
-author: "Mohammed Ali"
+author: "Mohammed Ali; Marwa Mohamed"
 date: "6/2/2019"
 output: github_document
 ---

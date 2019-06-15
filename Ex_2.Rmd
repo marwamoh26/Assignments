@@ -1,7 +1,7 @@
 ---
 title: 'Data Wrangling Exercise 2: Dealing with missing values'
-author: "Mohammed Ali"
-date: "6/2/2019"
+author: Mohammed Ali; Marwa Mohamed
+date: 6/2/2019
 output: github_document
 ---
 
