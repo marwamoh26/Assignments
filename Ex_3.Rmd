@@ -103,17 +103,17 @@ header <- t(read_table("data/UCI HAR Dataset/features.txt", col_names = FALSE))
 # Add header
 colnames(x) <- header
 
-#Read y train file (activty labels)
+#Read y train file (activty numberss)
 y <- read_table("data/UCI HAR Dataset/train/y_train.txt", col_names = FALSE)
 # Create header
-header <- "activity_label"
+header <- "activity_number"
 # Add header
 colnames(y) <- header
 
 # Create train data set
 train <- data.frame(total_acc_x, total_acc_y, total_acc_z, body_acc_x, body_acc_y, body_acc_z, body_gyro_x, body_gyro_y, body_gyro_z, x, y, subject )
-# Inspect first 5 rows in train data
-head(train)
+# Inspect train structure
+glimpse(train)
 
 ### Load test dataset
 # Read subject_test file
@@ -191,17 +191,17 @@ header <- t(read_table("data/UCI HAR Dataset/features.txt", col_names = FALSE))
 # Add header
 colnames(x) <- header
 
-#Read y test file (activty labels)
+#Read y test file (activty numbers)
 y <- read_table("data/UCI HAR Dataset/test/y_test.txt", col_names = FALSE)
 # Create header
-header <- "activity_label"
+header <- "activity_number"
 # Add header
 colnames(y) <- header
 
 # Create test data set
 test <- data.frame(total_acc_x, total_acc_y, total_acc_z, body_acc_x, body_acc_y, body_acc_z, body_gyro_x, body_gyro_y, body_gyro_z, x, y, subject)
-# Inspect first 5 rows in test data
-head(test)
+# Inspect test structure
+glimpse(test)
 
 
 ```
@@ -212,6 +212,10 @@ head(test)
 Merge the training and the test sets to create one data set.
 
 ```{r}
+# Combine both sets
+comb <- bind_rows(train, test)
+#
+head(comb)
 ```
 
 2: Mean and standard deviation
