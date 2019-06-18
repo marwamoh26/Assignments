@@ -7,6 +7,8 @@ output: github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+# load needed packages and install them if they do not exist
+easypackages::packages("tidyverse", "tidylog", prompt = F)
 ```
 
 ## Overview
@@ -25,6 +27,183 @@ This data set is organized in a way that makes it hard to use at first. You will
 Load the training and test data sets into RStudio, each in their own data frame.
 
 ```{r}
+### Load train dataset
+# Read subject_train file
+subject  <- read_table("data/UCI HAR Dataset/train/subject_train.txt", col_names = FALSE)
+# Add header
+colnames(subject ) <- "subject"
+
+#Read body_acc_x_train file
+body_acc_x <- read_table("data/UCI HAR Dataset/train/Inertial Signals/body_acc_x_train.txt", col_names = FALSE)
+# Create header eg.(body_acc_x_1)
+header <- paste0(rep("body_acc_x_", 128), c(1:128))
+# Add header
+colnames(body_acc_x) <- header
+
+#Read body_acc_y_train file
+body_acc_y <- read_table("data/UCI HAR Dataset/train/Inertial Signals/body_acc_y_train.txt", col_names = FALSE)
+# Create header eg.(body_acc_y_1)
+header <- paste0(rep("body_acc_y_", 128), c(1:128))
+# Add header
+colnames(body_acc_y) <- header
+
+#Read body_acc_z_train file
+body_acc_z <- read_table("data/UCI HAR Dataset/train/Inertial Signals/body_acc_z_train.txt", col_names = FALSE)
+# Create header eg.(body_acc_z_1)
+header <- paste0(rep("body_acc_z_", 128), c(1:128))
+# Add header
+colnames(body_acc_z) <- header
+
+#Read body_gyro_x_train file
+body_gyro_x <- read_table("data/UCI HAR Dataset/train/Inertial Signals/body_gyro_x_train.txt", col_names = FALSE)
+# Create header eg.(body_gyro_x_1)
+header <- paste0(rep("body_gyro_x_", 128), c(1:128))
+# Add header
+colnames(body_gyro_x) <- header
+
+#Read body_gyro_y_train file
+body_gyro_y <- read_table("data/UCI HAR Dataset/train/Inertial Signals/body_gyro_y_train.txt", col_names = FALSE)
+# Create header eg.(body_gyro_y_1)
+header <- paste0(rep("body_gyro_y_", 128), c(1:128))
+# Add header
+colnames(body_gyro_y) <- header
+
+#Read body_gyro_z_train file
+body_gyro_z <- read_table("data/UCI HAR Dataset/train/Inertial Signals/body_gyro_z_train.txt", col_names = FALSE)
+# Create header eg.(body_gyro_z_1)
+header <- paste0(rep("body_gyro_z_", 128), c(1:128))
+# Add header
+colnames(body_gyro_z) <- header
+
+#Read total_acc_x_train file
+total_acc_x <- read_table("data/UCI HAR Dataset/train/Inertial Signals/total_acc_x_train.txt", col_names = FALSE)
+# Create header eg.(total_acc_x_1)
+header <- paste0(rep("total_acc_x_", 128), c(1:128))
+# Add header
+colnames(total_acc_x) <- header
+
+#Read total_acc_y_train file
+total_acc_y <- read_table("data/UCI HAR Dataset/train/Inertial Signals/total_acc_y_train.txt", col_names = FALSE)
+# Create header eg.(total_acc_y_1)
+header <- paste0(rep("total_acc_y_", 128), c(1:128))
+# Add header
+colnames(total_acc_y) <- header
+
+#Read total_acc_z_train file
+total_acc_z <- read_table("data/UCI HAR Dataset/train/Inertial Signals/total_acc_z_train.txt", col_names = FALSE)
+# Create header eg.(total_acc_z_1)
+header <- paste0(rep("total_acc_z_", 128), c(1:128))
+# Add header
+colnames(total_acc_z) <- header
+
+#Read x train file
+x  <- read_table("data/UCI HAR Dataset/train/X_train.txt", col_names = FALSE)
+# Read features header
+header <- t(read_table("data/UCI HAR Dataset/features.txt", col_names = FALSE))
+# Add header
+colnames(x) <- header
+
+#Read y train file (activty labels)
+y <- read_table("data/UCI HAR Dataset/train/y_train.txt", col_names = FALSE)
+# Create header
+header <- "activity_label"
+# Add header
+colnames(y) <- header
+
+# Create train data set
+train <- data.frame(total_acc_x, total_acc_y, total_acc_z, body_acc_x, body_acc_y, body_acc_z, body_gyro_x, body_gyro_y, body_gyro_z, x, y, subject )
+# Inspect first 5 rows in train data
+head(train)
+
+### Load test dataset
+# Read subject_test file
+subject <- read_table("data/UCI HAR Dataset/test/subject_test.txt", col_names = FALSE)
+# Add header
+colnames(subject) <- "subject"
+
+#Read body_acc_x_test file
+body_acc_x <- read_table("data/UCI HAR Dataset/test/Inertial Signals/body_acc_x_test.txt", col_names = FALSE)
+# Create header eg.(body_acc_x_1)
+header <- paste0(rep("body_acc_x_", 128), c(1:128))
+# Add header
+colnames(body_acc_x) <- header
+
+#Read body_acc_y_test file
+body_acc_y <- read_table("data/UCI HAR Dataset/test/Inertial Signals/body_acc_y_test.txt", col_names = FALSE)
+# Create header eg.(body_acc_y_1)
+header <- paste0(rep("body_acc_y_", 128), c(1:128))
+# Add header
+colnames(body_acc_y) <- header
+
+#Read body_acc_z_test file
+body_acc_z <- read_table("data/UCI HAR Dataset/test/Inertial Signals/body_acc_z_test.txt", col_names = FALSE)
+# Create header eg.(body_acc_z_1)
+header <- paste0(rep("body_acc_z_", 128), c(1:128))
+# Add header
+colnames(body_acc_z) <- header
+
+#Read body_gyro_x_test file
+body_gyro_x <- read_table("data/UCI HAR Dataset/test/Inertial Signals/body_gyro_x_test.txt", col_names = FALSE)
+# Create header eg.(body_gyro_x_1)
+header <- paste0(rep("body_gyro_x_", 128), c(1:128))
+# Add header
+colnames(body_gyro_x) <- header
+
+#Read body_gyro_y_test file
+body_gyro_y <- read_table("data/UCI HAR Dataset/test/Inertial Signals/body_gyro_y_test.txt", col_names = FALSE)
+# Create header eg.(body_gyro_y_1)
+header <- paste0(rep("body_gyro_y_", 128), c(1:128))
+# Add header
+colnames(body_gyro_y) <- header
+
+#Read body_gyro_z_test file
+body_gyro_z <- read_table("data/UCI HAR Dataset/test/Inertial Signals/body_gyro_z_test.txt", col_names = FALSE)
+# Create header eg.(body_gyro_z_1)
+header <- paste0(rep("body_gyro_z_", 128), c(1:128))
+# Add header
+colnames(body_gyro_z) <- header
+
+#Read total_acc_x_test file
+total_acc_x <- read_table("data/UCI HAR Dataset/test/Inertial Signals/total_acc_x_test.txt", col_names = FALSE)
+# Create header eg.(total_acc_x_1)
+header <- paste0(rep("total_acc_x_", 128), c(1:128))
+# Add header
+colnames(total_acc_x) <- header
+
+#Read total_acc_y_test file
+total_acc_y <- read_table("data/UCI HAR Dataset/test/Inertial Signals/total_acc_y_test.txt", col_names = FALSE)
+# Create header eg.(total_acc_y_1)
+header <- paste0(rep("total_acc_y_", 128), c(1:128))
+# Add header
+colnames(total_acc_y) <- header
+
+#Read total_acc_z_test file
+total_acc_z <- read_table("data/UCI HAR Dataset/test/Inertial Signals/total_acc_z_test.txt", col_names = FALSE)
+# Create header eg.(total_acc_z_1)
+header <- paste0(rep("total_acc_z_", 128), c(1:128))
+# Add header
+colnames(total_acc_z) <- header
+
+#Read x test file
+x <- read_table("data/UCI HAR Dataset/test/X_test.txt", col_names = FALSE)
+# Read features header
+header <- t(read_table("data/UCI HAR Dataset/features.txt", col_names = FALSE))
+# Add header
+colnames(x) <- header
+
+#Read y test file (activty labels)
+y <- read_table("data/UCI HAR Dataset/test/y_test.txt", col_names = FALSE)
+# Create header
+header <- "activity_label"
+# Add header
+colnames(y) <- header
+
+# Create test data set
+test <- data.frame(total_acc_x, total_acc_y, total_acc_z, body_acc_x, body_acc_y, body_acc_z, body_gyro_x, body_gyro_y, body_gyro_z, x, y, subject)
+# Inspect first 5 rows in test data
+head(test)
+
+
 ```
 
 
