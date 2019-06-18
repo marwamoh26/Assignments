@@ -214,7 +214,7 @@ Merge the training and the test sets to create one data set.
 ```{r}
 # Combine both sets
 comb <- bind_rows(train, test)
-#
+#Inspect the first 5 rows in loaded data
 head(comb)
 ```
 
@@ -223,6 +223,12 @@ head(comb)
 Create two new columns, containing the mean and standard deviation for each measurement respectively. *Hint: Since some feature/column names are repeated, you may need to use the make.names() function in R*.
 
 ```{r}
+#make.names(colnames(comb), unique = TRUE)
+#a <- comb %>%
+#  group_by(activity_number) %>%
+#  select(contains("mean")) %>%
+#  mutate(mean = list(colMeans(., na.rm = TRUE)))
+
 ```
 
 ### 3: Add new variables
@@ -230,6 +236,16 @@ Create two new columns, containing the mean and standard deviation for each meas
 Create variables called `ActivityLabel` and `ActivityName` that label all observations with the corresponding activity labels and names respectively
 
 ```{r}
+# Add ActivityLabel column
+comb <- comb %>% 
+  mutate(ActivityLabel = case_when(activity_number == "1" ~ "Walking",                                                                        activity_number == "2" ~ "Walking_Upstairs",
+                                   activity_number == "3" ~ "Walking_ownstairs",
+                                   activity_number == "4" ~ "Sitting",
+                                   activity_number == "5" ~ "Standing",
+                                   activity_number == "6" ~ "Laying"),
+         ActivityLabel = factor(ActivityLabel, levels = c("Walking", "Walking_Upstairs", "Walkind_Downstairs", "Sitting", "Standing", "Laying")))
+# Inspect data structure
+glimpse(comb)
 ```
 
 ### 4: Create tidy data set
