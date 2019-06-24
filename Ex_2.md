@@ -133,53 +133,55 @@ table(titanic$age)
     ##      1      1      2      1      2      1      1      1
 
 ``` r
-# convert age to integers
-titanic$age <- as.integer(titanic$age)
-# replace missing and zero values with mean
-titanic$age[is.na(titanic$age) | titanic$age == 0] <- mean(titanic$age, na.rm = TRUE)
+# round age to integers
+titanic$age <- round(titanic$age)
+# replace missing values with mean
+titanic$age[is.na(titanic$age)] <- mean(titanic$age, na.rm = TRUE)
 # After cleaning
-table(titanic$age)
+summary(titanic$age)
 ```
 
-    ## 
-    ##                1                2                3                4 
-    ##               10               12                7               10 
-    ##                5                6                7                8 
-    ##                5                6                4                6 
-    ##                9               10               11               12 
-    ##               10                4                5                3 
-    ##               13               14               15               16 
-    ##                5               10                6               19 
-    ##               17               18               19               20 
-    ##               20               42               29               24 
-    ##               21               22               23               24 
-    ##               41               44               27               48 
-    ##               25               26               27               28 
-    ##               34               31               30               35 
-    ##               29 29.8575525812619               30               31 
-    ##               30              276               42               23 
-    ##               32               33               34               35 
-    ##               28               21               18               23 
-    ##               36               37               38               39 
-    ##               33                9               15               20 
-    ##               40               41               42               43 
-    ##               21               11               18                9 
-    ##               44               45               46               47 
-    ##               10               23                6               14 
-    ##               48               49               50               51 
-    ##               14                9               15                8 
-    ##               52               53               54               55 
-    ##                6                4               10                9 
-    ##               56               57               58               59 
-    ##                4                5                6                3 
-    ##               60               61               62               63 
-    ##                8                5                5                4 
-    ##               64               65               66               67 
-    ##                5                3                1                1 
-    ##               70               71               74               76 
-    ##                3                2                1                1 
-    ##               80 
-    ##                1
+    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    ##    0.00   22.00   29.87   29.87   35.00   80.00
+
+``` r
+####
+
+# add age_fac column
+titanic <- titanic %>% 
+  mutate(age_fac = case_when(age <= 12 ~ "child",
+            age >= 13 & age <= 18 ~ "teenage",
+            age >= 19 & age <= 30 ~ "youth",
+            age >= 31 & age <= 50 ~ "senior",
+            age >= 51 ~ "elder"))
+```
+
+    ## mutate: new variable 'age_fac' with 5 unique values and 0% NA
+
+``` r
+# add levels to new column
+levels(titanic$age_fac) <- c("child", "teenage", "youth", "senior", "elder")
+# Inspect data structure
+glimpse(titanic)
+```
+
+    ## Observations: 1,310
+    ## Variables: 15
+    ## $ pclass    <int> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1...
+    ## $ survived  <int> 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1...
+    ## $ name      <fct> "Allen, Miss. Elisabeth Walton", "Allison, Master. H...
+    ## $ sex       <fct> female, male, female, male, female, male, female, ma...
+    ## $ age       <dbl> 29.00000, 1.00000, 2.00000, 30.00000, 25.00000, 48.0...
+    ## $ sibsp     <int> 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 1, 1, 0, 0, 0, 0, 0, 0...
+    ## $ parch     <int> 0, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1...
+    ## $ ticket    <fct> 24160, 113781, 113781, 113781, 113781, 19952, 13502,...
+    ## $ fare      <dbl> 211.3375, 151.5500, 151.5500, 151.5500, 151.5500, 26...
+    ## $ cabin     <fct> B5, C22 C26, C22 C26, C22 C26, C22 C26, E12, D7, A36...
+    ## $ embarked  <fct> S, S, S, S, S, S, S, S, S, C, C, C, C, S, S, S, C, C...
+    ## $ boat      <fct> 2, 11, NA, NA, NA, 3, 10, NA, D, NA, NA, 4, 9, 6, B,...
+    ## $ body      <int> NA, NA, NA, 135, NA, NA, NA, NA, NA, 22, 124, NA, NA...
+    ## $ home.dest <fct> "St Louis, MO", "Montreal, PQ / Chesterville, ON", "...
+    ## $ age_fac   <chr> "youth", "child", "child", "youth", "youth", "senior...
 
 ### 3: Lifeboat
 
@@ -204,12 +206,18 @@ levels(titanic$boat) <- c(levels(titanic$boat), 'None')
 # replace missing boat life with NA
 titanic$boat[is.na(titanic$boat)] <- 'None'
 # After cleaning
-table(is.na(titanic$boat))
+table((titanic$boat))
 ```
 
     ## 
-    ## FALSE 
-    ##  1310
+    ##       2      11       3      10       D       4       9       6       B 
+    ##      13      25      26      29      20      31      25      20       9 
+    ##       8       A       5       7       C      14     5 9      13       1 
+    ##      23      11      27      23      38      33       1      39       5 
+    ##      15     5 7    8 10      12      16 13 15 B     C D   15 16   13 15 
+    ##      37       2       1      19      23       1       2       1       2 
+    ##    None 
+    ##     824
 
 ### 4: Cabin
 
@@ -232,12 +240,12 @@ glimpse(titanic)
 ```
 
     ## Observations: 1,310
-    ## Variables: 15
+    ## Variables: 16
     ## $ pclass           <int> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
     ## $ survived         <int> 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, ...
     ## $ name             <fct> "Allen, Miss. Elisabeth Walton", "Allison, Ma...
     ## $ sex              <fct> female, male, female, male, female, male, fem...
-    ## $ age              <dbl> 29.00000, 29.85755, 2.00000, 30.00000, 25.000...
+    ## $ age              <dbl> 29.00000, 1.00000, 2.00000, 30.00000, 25.0000...
     ## $ sibsp            <int> 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 1, 1, 0, 0, 0, ...
     ## $ parch            <int> 0, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...
     ## $ ticket           <fct> 24160, 113781, 113781, 113781, 113781, 19952,...
@@ -247,4 +255,5 @@ glimpse(titanic)
     ## $ boat             <fct> 2, 11, None, None, None, 3, 10, None, D, None...
     ## $ body             <int> NA, NA, NA, 135, NA, NA, NA, NA, NA, 22, 124,...
     ## $ home.dest        <fct> "St Louis, MO", "Montreal, PQ / Chesterville,...
+    ## $ age_fac          <chr> "youth", "child", "child", "youth", "youth", ...
     ## $ has_cabin_number <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, ...

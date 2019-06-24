@@ -59,12 +59,26 @@ Think about other ways you could have populated the missing values in the age co
 ```{r}
 # age before cleaning
 table(titanic$age)
-# convert age to integers
-titanic$age <- as.integer(titanic$age)
-# replace missing and zero values with mean
-titanic$age[is.na(titanic$age) | titanic$age == 0] <- mean(titanic$age, na.rm = TRUE)
+# round age to integers
+titanic$age <- round(titanic$age)
+# replace missing values with mean
+titanic$age[is.na(titanic$age)] <- mean(titanic$age, na.rm = TRUE)
 # After cleaning
-table(titanic$age)
+summary(titanic$age)
+####
+
+# add age_fac column
+titanic <- titanic %>% 
+  mutate(age_fac = case_when(age <= 12 ~ "child",
+            age >= 13 & age <= 18 ~ "teenage",
+            age >= 19 & age <= 30 ~ "youth",
+            age >= 31 & age <= 50 ~ "senior",
+            age >= 51 ~ "elder"))
+# add levels to new column
+levels(titanic$age_fac) <- c("child", "teenage", "youth", "senior", "elder")
+# Inspect data structure
+glimpse(titanic)
+
 ```
 
 ### 3: Lifeboat
@@ -79,7 +93,7 @@ levels(titanic$boat) <- c(levels(titanic$boat), 'None')
 # replace missing boat life with NA
 titanic$boat[is.na(titanic$boat)] <- 'None'
 # After cleaning
-table(is.na(titanic$boat))
+table((titanic$boat))
 ```
 
 ### 4: Cabin
