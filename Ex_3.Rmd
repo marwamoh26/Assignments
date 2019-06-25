@@ -224,10 +224,10 @@ Create two new columns, containing the mean and standard deviation for each meas
 
 ```{r}
 #make.names(colnames(comb), unique = TRUE)
-#a <- comb %>%
-#  group_by(activity_number) %>%
-#  select(contains("mean")) %>%
-#  mutate(mean = list(colMeans(., na.rm = TRUE)))
+a <- comb %>%
+  group_by(activity_number) %>%
+  select(contains("mean")) %>%
+  mutate(mean = list(colMeans(., na.rm = TRUE)))
 
 ```
 
@@ -242,8 +242,9 @@ comb <- comb %>%
                                    activity_number == "3" ~ "Walking_ownstairs",
                                    activity_number == "4" ~ "Sitting",
                                    activity_number == "5" ~ "Standing",
-                                   activity_number == "6" ~ "Laying"),
-         ActivityLabel = factor(ActivityLabel, levels = c("Walking", "Walking_Upstairs", "Walkind_Downstairs", "Sitting", "Standing", "Laying")))
+                                   activity_number == "6" ~ "Laying",
+                                   activity_number == "NA" ~ "None"),
+         ActivityLabel = factor(ActivityLabel, levels = c("Walking", "Walking_Upstairs", "Walkind_Downstairs", "Sitting", "Standing", "Laying", "None")))
 # Inspect data structure
 glimpse(comb)
 ```
@@ -253,5 +254,9 @@ glimpse(comb)
 From the data set in step 3, creates a second, independent tidy data set with the average of each variable for each activity and each subject. 
 
 ```{r}
+avg <- comb %>% 
+  group_by(ActivityLabel, subject) %>% 
+  summarise_each(funs(mean))
+glimpse(avg)
 ```
 
