@@ -223,11 +223,16 @@ head(comb)
 Create two new columns, containing the mean and standard deviation for each measurement respectively. *Hint: Since some feature/column names are repeated, you may need to use the make.names() function in R*.
 
 ```{r}
-#make.names(colnames(comb), unique = TRUE)
-a <- comb %>%
-  group_by(activity_number) %>%
-  select(contains("mean")) %>%
-  mutate(mean = list(colMeans(., na.rm = TRUE)))
+# get mean columns
+mean <- comb %>%
+  select(contains("mean")) 
+# get std columns
+std <- comb %>% 
+  select(contains("std"))
+# bind the 2 datasets
+mean_std <- bind_cols(mean, std)
+# Inspect data structure
+glimpse(mean_std)
 
 ```
 
