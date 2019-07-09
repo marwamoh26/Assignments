@@ -1,0 +1,354 @@
+---
+title: "Analysis of IGN dataset in R"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Given my recent foray into R and ggplot, it seemed appropriate to take a break from the usual Python jupyter notebooks. I have chosen IGN dataset from kaggle here https://www.kaggle.com/egrinstein/20-years-of-games to do a quick data manipulation and visualization of the data.
+
+```{r}
+# load packages
+library(tidyverse)
+library(readr)
+```
+
+After loading the tidyverse package, which contains useful packages like ggplot2 and dplyr, we begin by reading in the csv not as factors.
+```{r}
+# read csv of ign data into a dataframe
+ign <- read.csv('data/ign.csv', stringsAsFactors = FALSE)
+head(ign)
+```
+
+A quick look at the dataframe reveal some interesting variables. In particular, the title, platform, score, genre, and release_year variables.
+
+```{r}
+# a summary of the variables in the dataframe
+str(ign)
+summary(ign)
+```
+
+```{r}
+names(ign)
+```
+
+A look at the top rated titles don't seem to be too interesting as there are multiple title with scores of 9 and 10. Let's instead look at the average review scores based on particular groupings.
+
+Top-rated titles
+```{r}
+head(ign[order(ign$score, decreasing = TRUE),])
+```
+
+```{r}
+length(unique(ign$genre))
+```
+
+As there are 112 unique genres, lets just take the top 10 genres.
+Top-rated genre
+```{r}
+ign %>%
+  group_by(genre) %>%
+  summarise(mean_score = mean(score)) %>%
+  arrange(desc(mean_score)) %>%
+  head(., n=10) %>%
+  ggplot() +
+  geom_bar(aes(x=reorder(genre, -mean_score), y=mean_score, fill=genre), stat="identity") +
+  geom_label(aes(x=reorder(genre, -mean_score), y=mean_score, label = round(mean_score,digits = 2))) +
+  guides(fill = FALSE) +
+  labs(title = "Top 10 Genres by Mean Review Score", x="Genre", y="Mean Review Score") +
+  theme(axis.text.x = element_text(size = 10, angle = 45, hjust = 1))
+```
+
+```{r}
+length(unique(ign$platform))
+```
+Similarly, we take the top 10 out of 59 platforms examine the average review score.
+
+Top-rated platforms
+```{r}
+ign %>%
+  group_by(platform) %>%
+  summarise(mean_score = mean(score)) %>%
+  arrange(desc(mean_score)) %>%
+  head(., n=10) %>%
+  ggplot() +
+  geom_bar(aes(x=reorder(platform, -mean_score), y=mean_score, fill = platform), stat="identity") +
+  geom_label(aes(x=reorder(platform, -mean_score), y=mean_score, label=round(mean_score, digits = 2))) +
+  labs(title = "Top 10 Platforms by Mean Review Score", x="Platform", y="Mean Review Score") +
+  theme(axis.text.x = element_text(size = 10, angle = 45, hjust = 1)) + 
+  guides(fill = FALSE)
+```
+
+Number of Games in Each Platform
+
+```{r}
+ign %>%
+  group_by(platform) %>%
+  summarise(counts = n()) %>%
+  arrange(desc(counts)) %>%
+  head(., n=10) %>%
+  ggplot() +
+  geom_bar(aes(x=reorder(platform, -counts), y=counts, fill=platform), stat="identity") +
+  geom_label(aes(x=reorder(platform, -counts), y=counts, label = counts)) + 
+  labs(title = "Top 10 Platforms by Number of Games", x="Platform", y="Total Number of Games") +
+  theme(axis.text.x = element_text(size = 10, angle = 45, hjust = 1)) + 
+  guides(fill = FALSE)
+```
+
+Are all 122 genres necessary? The division here might be too granular. There are quite a few genres like 'Adventure, Platformer' and 'Adventure, Episodic' that have the same primary genre of 'Adventure'. I thus wrote a function to get the primary genre of each game by taking the first word of the genre variable.
+
+String split function
+```{r}
+# string split function to get the main game genre
+get_genre <- function(string) {
+  length <- sapply(strsplit(string, ","), length)
+  return(sapply(strsplit(string,","), function(x) x[1]))
+}
+get_genre("Compilation, Compilation")
+```
+
+The new main_genre variable now includes a much more manageable 31 unique genres. There seems to be one named NA though. Lets take a look.
+
+Consolidating genres
+```{r}
+# creating new column for main genre based on above created function
+ign$main_genre <- get_genre(ign$genre)
+unique(ign$main_genre)
+```
+
+There are 36 rows with missing genre values. As this is a really small sample of the 18,000+ observations and it would take unecessary effort to label them manually, we drop these observations with NA genre values.
+
+Dropping NA values
+```{r}
+# games that dont have a genre
+head(ign[is.na(ign$main_genre),])
+```
+
+```{r}
+# checking to see if NA are dropped
+ign <- ign[!is.na(ign$main_genre),]
+dim(ign)
+```
+
+Double-checking here to make sure there aren't any NA values in the other values.
+
+```{r}
+# checking for any other missing values
+apply(ign, 2, function(x) any(is.na(x)))
+```
+
+With the newly reduced genres, lets look at the mean review score distribution again, this time with all the genres. We see that compilation games have dropped quite far back while hardware games remain far and away the highest rated games. What are hardware games though? 
+
+```{r}
+ign %>%
+  group_by(main_genre) %>%
+  summarise(mean_score = mean(score)) %>%
+  arrange(desc(mean_score)) %>%
+  head(., n=10) %>%
+  ggplot() +
+  geom_bar(aes(x=reorder(main_genre, -mean_score), y=mean_score, fill = main_genre), stat="identity") +
+  labs(title = "Top 10 Main Genres by Mean Review Score", x="Main Genre", y="Mean Review Score") +
+  theme(axis.text.x = element_text(size = 10, angle = 45, hjust = 1)) + 
+  guides(fill = FALSE)
+```
+
+```{r}
+ign %>%
+  group_by(main_genre) %>%
+  summarise(mean_score = mean(score)) %>%
+  arrange(desc(mean_score)) %>%
+  ggplot() +
+  geom_bar(aes(x=reorder(main_genre, -mean_score), y=mean_score, fill = main_genre), stat="identity") +
+  labs(title = "All Main Genres by Mean Review Score", x="Main Genre", y="Mean Review Score") +
+  theme(axis.text.x = element_text(size = 10, angle = 60, hjust = 1)) + 
+  guides(fill = FALSE)
+```
+
+Apparently they refer to VR hardware and are only represented by two entries. Given the nascent VR industry, this paucity of observations seems to be appropriate.
+
+```{r}
+ign[ign$main_genre == 'Hardware',]
+```
+
+Given that the hardware category only has two observations, which are the genres with the most games?
+
+```{r}
+ign %>%
+  group_by(main_genre) %>%
+  summarise(games_count = n()) %>%
+  arrange(desc(games_count)) %>%
+  ggplot() +
+  geom_bar(aes(x=reorder(main_genre, -games_count), y=games_count, fill = main_genre), stat="identity") +
+  labs(title = "All Main Genres by Total Number of Games", x="Main Genre", y="Total Number of Games") +
+  theme(axis.text.x = element_text(size = 10, angle = 60, hjust = 1)) + 
+  guides(fill = FALSE)
+```
+
+```{r}
+ign %>%
+  group_by(main_genre) %>%
+  summarise(total_games = n()) %>%
+  ggplot() +
+  geom_point(aes(x=reorder(main_genre, -total_games), y=total_games), size =3) + 
+  geom_segment(aes(x=reorder(main_genre, -total_games),
+                   xend=reorder(main_genre, -total_games),
+                   y=0,
+                   yend=total_games)) + 
+  theme(axis.text.x = element_text(size = 10, angle = 60, hjust = 1)) +
+  labs(title="Lollipop Chart of All Genres By Total Game Count",
+       x="Genre",
+       y="Total Game Count")
+```
+
+Group by Title
+
+By looking at unique titles, there are 6033 titles, around 1/3 of the total that repeat. We will create a new dataframe that ignores the platform that they are on and focuses on the title.
+```{r}
+length(ign$title) - length(unique(ign$title))
+```
+
+Using grepl to filter by string in a title
+```{r}
+ign %>%
+  filter(., grepl("LittleBigPlanet", title))
+```
+
+```{r}
+grouped_title_ign <- ign %>%
+  group_by(title) %>%
+  summarise(score = round(mean(score),1), release_year = first(release_year), count=n(), main_genre = first(main_genre))
+tail(grouped_title_ign, limit=5)
+```
+
+Top genres again after grouping
+```{r}
+grouped_title_ign %>%
+  group_by(main_genre) %>%
+  summarise(mean_score = round(mean(score),2)) %>%
+  ggplot() +
+  geom_bar(stat="identity", aes(x=reorder(main_genre, -mean_score), y=mean_score, fill = main_genre)) +
+  guides(fill = FALSE) +
+  theme(axis.text.x = element_text(size = 10, angle = 45, hjust = 1)) + 
+  labs(title = "All Main Genres by Mean Review Score (After Grouping)", x="Main Genre", y="Mean Review Score")
+```
+
+Top genres by game count
+```{r}
+grouped_title_ign %>%
+  group_by(main_genre) %>%
+  summarise(total_games = n()) %>%
+  ggplot() +
+  geom_bar(stat="identity", aes(x=reorder(main_genre, -total_games), y=total_games, fill = main_genre)) +
+  guides(fill = FALSE) +
+  theme(axis.text.x = element_text(size = 10, angle = 60, hjust = 1)) + 
+  labs(title = "All Main Genres by Total Game Count", x="Main Genre", y="Total Game Count")
+```
+
+Lollipop chart
+```{r}
+grouped_title_ign %>%
+  group_by(main_genre) %>%
+  summarise(total_games = n()) %>%
+  ggplot() +
+  geom_point(aes(x=reorder(main_genre, -total_games), y=total_games), size =3) + 
+  geom_segment(aes(x=reorder(main_genre, -total_games),
+                   xend=reorder(main_genre, -total_games),
+                   y=0,
+                   yend=total_games)) + 
+  theme(axis.text.x = element_text(size = 10, angle = 60, hjust = 1)) +
+  labs(title="Lollipop Chart of All Main Genres By Total Game Count",
+       x="Main Genre",
+       y="Total Game Count")
+```
+
+
+Pie chart
+```{r}
+grouped_title_ign %>%
+  group_by(main_genre) %>%
+  summarise(total_games = n()) %>%
+  arrange(desc(total_games)) %>%
+  head(n=12) %>%
+  ggplot() + 
+  geom_bar(aes(x='', y=total_games,fill=factor(main_genre)), width=1, stat="identity") +
+  theme(axis.line = element_blank(), 
+        plot.title = element_text(hjust=0.5)) + 
+  coord_polar(theta="y", start=0) +
+  labs(fill="Main Genre", 
+       x=NULL,
+       y=NULL,
+       title="Distribution of Games Across Top Genres")
+```
+
+```{r}
+grouped_title_ign %>%
+  arrange(desc(count)) %>%
+  tail()
+```
+
+Most represented game across platforms
+```{r}
+grouped_title_ign %>%
+  arrange(desc(count)) %>%
+  subset(., count>=8) %>%
+  ggplot() +
+  geom_bar(aes(x=reorder(title, -count), y=count, fill=title), stat="identity") +
+  geom_label(aes(x=reorder(title, -count), y=count, label=count)) + 
+  theme(axis.text.x = element_text(size = 8, angle = 45, hjust = 1)) +
+  guides(fill=FALSE) +
+  labs(title = "Top Represented Titles Across Platforms", x="Title", y="Number of Platforms")
+```
+
+Top rated titles
+```{r}
+subset(grouped_title_ign, score==10)
+```
+
+Box Plot of Mean Review
+```{r}
+grouped_title_ign %>%
+  group_by(main_genre) %>%
+  ggplot() +
+  geom_boxplot(aes(x=main_genre, y=score, fill="coral2")) +
+  theme(axis.text.x = element_text(size = 8, angle = 45, hjust = 1)) +
+  labs(title = "Boxplot of Mean Review Scores Across Genres", x="Main Genre", y="Review Score") +
+  guides(fill=FALSE)
+```
+
+```{r}
+# install.packages('forecast', dependencies = TRUE, repos="http://cran.wustl.edu/")
+# install.packages('TTR', dependencies = TRUE)
+```
+
+```{r}
+library(forecast)
+# install.packages('directlabels')
+library(directlabels)
+```
+Seasonal Plot Across Platforms
+```{r}
+unique(ign$release_year)
+```
+  
+```{r}
+ign %>%
+  subset(., release_year>1990 & release_year<=2010) %>%
+  group_by(platform, release_year) %>%
+  summarise(total_games = n()) %>%
+  subset(., total_games>10) %>%
+  ggplot() +
+  geom_line(aes(x=release_year, y=total_games, group=platform, col=platform))+
+  geom_point(aes(x=release_year, y=total_games, group=platform, col=platform)) +
+  geom_dl(aes(x=release_year, y=total_games, label = platform), method=list("first.bumpup", cex=0.5)) +
+  guides(col=FALSE) +
+  scale_x_continuous(breaks=c(1996:2010), 
+                   labels=factor(1996:2010),
+                   limits=c(1995,2010)) +
+  labs(title="Number of IGN Listed Games Across Platforms 1996-2010", x='Release Year', y='IGN Listed Games in Year')
+  
+```
+
+
