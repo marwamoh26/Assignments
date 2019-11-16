@@ -1,0 +1,83 @@
+---
+title: "reading test scores"
+author: "Marwa Mohamed"
+date: "11/13/2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# load needed packages and install them if they do not exist
+easypackages::packages("tidyverse", prompt = F)
+```
+## overview
+The Programme for International Student Assessment (PISA) is a test given every three years to 15-year-old students from around the world to evaluate their performance in mathematics, reading, and science. This test provides a quantitative way to compare the performance of students from different parts of the world. In this homework assignment, we will predict the reading scores of students from the United States of America on the 2009 PISA exam.
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+### 0: Load the data in RStudio
+```{r}
+pisa_train = read_csv("data/pisa2009train.csv")
+str(pisa_train)
+
+pisa_test = read_csv("data/pisa2009test.csv")
+summary(pisa_test)
+```
+
+## Summarizing the dataset
+```{r}
+#the average reading test score of males
+male_average = pisa_train$readingScore %>% 
+  tapply(pisa_train$male == 1, mean)
+(male_average)
+```
+## Missing data
+```{r}
+#get columns with missing data
+colnames(pisa_train)[colSums(is.na(pisa_train)) > 0]
+```
+## Removing missing values
+```{r}
+pisa_train = na.omit(pisa_train)
+
+pisa_test = na.omit(pisa_test)
+```
+
+## Building linear model
+```{r}
+#convert character to factor
+pisa_train$raceeth <- as.factor(pisa_train$raceeth)
+pisa_test$raceeth <- as.factor(pisa_test$raceeth)
+
+#Set the reference level of the factor to white
+pisa_train$raceeth = relevel(pisa_train$raceeth, 'White')
+pisa_test$raceeth = relevel(pisa_test$raceeth, "White")
+
+#linear model
+lmScore = lm(readingScore ~ ., data = pisa_train)
+summary(lmScore)
+```
+
+## Calculate RMSE
+```{r}
+SSE = sum(lmScore$residuals^2)
+RMSE = sqrt(SSE/nrow(pisa_train))
+```
+
+## predict reading score
+```{r}
+predTest = predict(lmScore, newdata = pisa_test)
+summary(predTest)
+#calculate predication error
+SSE = sum((pisa_test$readingScore - predTest)^2)
+RMSE = sqrt(SSE/nrow(pisa_test))
+baseline = mean(pisa_train$readingScore)
+SST = sum((pisa_test$readingScore - baseline)^2)
+(R2 = 1 - SSE / SST)
+```
+
+
