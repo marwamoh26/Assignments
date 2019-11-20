@@ -1,0 +1,131 @@
+---
+title: "Detectino flu epidemics"
+author: "Marwa Mohamed"
+date: "11/16/2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# load needed packages and install them if they do not exist
+easypackages::packages("tidyverse", "zoo", prompt = F)
+```
+
+## overview
+Flu epidemics constitute a major public health concern causing respiratory illnesses, hospitalizations, and deaths. According to the National Vital Statistics Reports published in October 2012, influenza ranked as the eighth leading cause of death in 2011 in the United States. Each year, 250,000 to 500,000 deaths are attributed to influenza related diseases throughout the world.
+
+The U.S. Centers for Disease Control and Prevention (CDC) and the European Influenza Surveillance Scheme (EISS) detect influenza activity through virologic and clinical data, including Influenza-like Illness (ILI) physician visits. Reporting national and regional data, however, are published with a 1-2 week lag.
+
+The Google Flu Trends project was initiated to see if faster reporting can be made possible by considering flu-related online search queries -- data that is available almost immediately.
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+### 0: Load the data in RStudio
+```{r} 
+fluTrain = read_csv("data/FluTrain.csv")
+str(fluTrain)
+fluTest = read_csv("data/FluTest.csv")
+str(fluTest)
+```
+
+## Select data
+
+```{r}
+#the week that corresponds to the highest percentage of ILI-related physician visits?
+fluTrain[max(fluTrain$ILI), ]
+((fluTrain %>% 
+  filter(ILI == max(ILI)))[1])
+
+#the week that corresponds to the highest percentage of ILI-related query fraction
+((fluTrain %>% 
+  filter(Queries == max(Queries)))[1])
+
+```
+## Understanding the Data
+```{r}
+fluTrain %>% 
+  ggplot(aes(x = ILI)) + 
+  geom_histogram(col = "red", fill = "white") +
+  labs(title = " The distribution of values of ILI?") +
+  theme_dark()
+```
+```{r}
+#Plot the natural logarithm of ILI versus Queries.
+fluTrain %>% 
+  ggplot(aes(x = Queries, y = log(ILI))) + 
+  geom_point(col = "black") +
+  labs(title = "The natural logarithm of ILI versus Queries", y = "Natyral logarithm of ILI") +
+  theme_classic()
+```
+
+##  Linear Regression Model
+```{r}
+fluModel <- lm(log(ILI) ~ Queries, data = fluTrain)
+summary(fluModel)
+```
+
+## Calculate correlation 
+```{r}
+corr = cor(log(fluTrain$ILI), fluTrain$Queries)
+
+```
+
+## Performance on the Test Set
+```{r}
+fluPredict = exp(predict(fluModel, newdata = fluTest))
+
+#the percentage of ILI-related physician visits for the week of March 11, 2012
+estILI = fluPredict[which(fluTest$Week == "2012-03-11 - 2012-03-17")]
+#observed ILI for the week of March 11, 2012
+obsILI = (fluTest %>% 
+  filter(fluTest$Week == "2012-03-11 - 2012-03-17"))[2]
+# relative error betweeen the estimate and the observed value for the week of March 11, 2012
+relError = (obsILI - estILI)/obsILI
+
+#RMSE
+SSE = sum((fluTest$ILI - fluPredict)^2)
+(RMSE = sqrt(SSE/nrow(fluTest)))
+```
+
+
+##Training a Time Series Model
+```{r}
+#return 2 observations before the current one
+ILILag_2 = lag(zoo(fluTrain$ILI), 2, na.pad=TRUE)
+
+fluTrain$ILILag2 = coredata(ILILag_2)
+#count of NA elements
+fluTrain %>% 
+  count(ILILag2 =="NA")
+# plot the log of ILILag2 against the log of ILI.
+plot(log(fluTrain$ILI), log(fluTrain$ILILag2))
+#linear regression model
+fluModel2 = lm(log(ILI) ~ Queries + log(ILILag2), data = fluTrain)
+summary(fluModel2)
+```
+
+```{r}
+#return 2 observations before the current one
+ILILag_2 = lag(zoo(fluTest$ILI), 2, na.pad=TRUE)
+
+fluTest$ILILag2 = coredata(ILILag_2)
+#count of NA elements
+fluTest %>% 
+    count(ILILag2 =="NA")
+#Fill in the missing values for ILILag2 in FluTest with 2 weeks earlier
+fluTest$ILILag2[1] = fluTrain$ILI[nrow(fluTrain) - 1]
+fluTest$ILILag2[2] = fluTrain$ILI[nrow(fluTrain)]
+```
+
+## Performance on the Test Set
+```{r}
+fluPredict2 = exp(predict(fluModel2, newdata = fluTest))
+
+#RMSE
+SSE = sum((fluTest$ILI - fluPredict2)^2)
+(RMSE = sqrt(SSE/nrow(fluTest)))
+```
