@@ -1,0 +1,101 @@
+---
+title: "State data"
+author: "Marwa Mohamed"
+date: "11/20/2019"
+output: github_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# load needed packages and install them if they do not exist
+easypackages::packages("tidyverse", prompt = F)
+```
+## overview
+In this problem, we will be examining the "state" dataset, which has data from the 1970s on all fifty US states. For each state, the dataset includes the population, per capita income, illiteracy rate, murder rate, high school graduation rate, average number of frost days, area, latitude and longitude, division the state belongs to, region the state belongs to, and two-letter abbreviation.
+
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+##Load the dataset and convert it to a data frame 
+```{r}
+data(state)
+
+statedata = cbind(data.frame(state.x77), state.abb, state.area, state.center,  state.division, state.name, state.region)
+str(statedata)
+```
+
+## Including Plots
+The shape of the plot should look like the outline of the United States! Note that Alaska and Hawaii have had their coordinates adjusted to appear just off of the west coast.
+
+```{r pressure, echo=FALSE}
+statedata %>% 
+  ggplot(aes(x = x, y = y)) +
+  geom_point(col = 'red') +
+  labs(x = 'longitude', y = 'latitude') +
+  theme_classic()
+```
+##Data exploration
+determine which region of the US (West, North Central, South, or Northeast) has the highest average high school graduation rate of all the states in the region:
+```{r}
+ # rename HS.Grad & state.region
+colnames(statedata)[6] <- 'HS_Grad'
+colnames(statedata)[15] <- 'state_region'
+  tapply(statedata$HS_Grad, statedata$state_region, max)
+  
+```
+##
+make a boxplot of the murder rate by region
+```{r}
+statedata %>% 
+  group_by(state_region) %>% 
+  ggplot() +
+  geom_boxplot(aes(y = Murder, fill = state_region))
+
+
+```
+#the corresponding state of the outlier in the Northeast region in the boxplot
+```{r}
+northEast <- statedata %>% 
+  filter(state_region == 'Northeast') 
+str(northEast)
+northEast[which.max(northEast$Murder),14]
+
+```
+##Predicting Life Expectancy - An Initial Model
+```{r}
+
+expectancyModdel = lm(Life.Exp ~ Population + Income + Illiteracy + Murder + HS_Grad + Frost + Area, data = statedata)
+summary(expectancyModdel)
+
+plot(statedata$Income, statedata$Life.Exp)
+```
+##Improving model
+```{r}
+expectancyModel2 = lm(Life.Exp ~ Population + Murder + HS_Grad + Frost, data = statedata)
+summary(expectancyModel2)
+
+```
+
+##Predict life expectancy
+```{r}
+lifePred= predict(expectancyModel2, newdata = statedata)
+summary(lifePred)
+
+# the state that predicted to have the lowest life expectancy
+sort(lifePred)[1]
+# the state actually has the lowest life expectancy
+statedata[which.min(statedata$Life.Exp), 14]
+
+# the state that predicted to have the highest life expectancy
+sort(lifePred)[length(lifePred)]
+# the state actually has the lowest life expectancy
+statedata[which.max(statedata$Life.Exp), 14]
+
+# the state that make the smallest absolute error
+which.min(abs(expectancyModel2$residuals))
+# the state that make the highest absolute error
+which.max(abs(expectancyModel2$residuals))
+```
