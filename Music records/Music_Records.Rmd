@@ -1,0 +1,89 @@
+---
+title: "Music_Records"
+author: "Marwa Mohamed"
+date: "2/18/2020"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# load needed packages and install them if they do not exist
+easypackages::packages("tidyverse", prompt = F)
+```
+
+## R Markdown
+
+The music industry has a well-developed market with a global annual revenue around $15 billion. The recording industry is highly competitive and is dominated by three big production companies which make up nearly 82% of the total annual album sales.
+
+Artists are at the core of the music industry and record labels provide them with the necessary resources to sell their music on a large scale. A record label incurs numerous costs (studio recording, marketing, distribution, and touring) in exchange for a percentage of the profits from album sales, singles and concert tickets.
+
+Unfortunately, the success of an artist's release is highly uncertain: a single may be extremely popular, resulting in widespread radio play and digital downloads, while another single may turn out quite unpopular, and therefore unprofitable.
+
+Knowing the competitive nature of the recording industry, record labels face the fundamental decision problem of which musical releases to support to maximize their financial success.
+
+How can we use analytics to predict the popularity of a song? In this assignment, we challenge ourselves to predict whether a song will reach a spot in the Top 10 of the Billboard Hot 100 Chart.
+
+Taking an analytics approach, we aim to use information about a song's properties to predict its popularity. The dataset songs (CSV) consists of all songs which made it to the Top 10 of the Billboard Hot 100 Chart from 1990-2010 plus a sample of additional songs that didn't make the Top 10.
+
+### 0: Load the data in RStudio
+```{r}
+songs = read_csv("data/songs.csv")
+#dataset structure
+str(songs)
+```
+
+### Understanding the Data
+How many songs does the dataset include for which the artist name is "Michael Jackson"?
+```{r}
+count(songs, artistname == "Michael Jackson")
+```
+### divide data
+
+```{r}
+SongsTrain = filter(songs, year <= 2009)
+str(SongsTrain)
+SongsTest = filter(songs, year == 2010)
+str(SongsTest)
+```
+
+### Creating Prediction Model
+ exclude some of the variables in dataset from being used as independent variables 
+```{r}
+nonvars = c("year", "songtitle", "artistname", "songID", "artistID")
+
+# To remove these variables from your training and testing sets, type the following commands in your R console:
+
+SongsTrain = SongsTrain[ , !(names(SongsTrain) %in% nonvars) ]
+
+SongsTest = SongsTest[ , !(names(SongsTest) %in% nonvars) ]
+
+```
+
+build a logistic regression model
+```{r}
+SongsLog1 = glm(Top10 ~ ., data=SongsTrain, family=binomial)
+summary(SongsLog1)
+#Conclusion
+#20 variables have at least one star next to the p-values, which represents significance at the 5% level.
+#The higher our confidence about time signature, key and tempo, the more likely the song is to be in the Top 10
+#Mainstream listeners tend to prefer less complex songs
+#Mainstream listeners prefer songs with heavy instrumentation
+
+```
+### Validating Model
+```{r}
+SongsTestPred = predict(SongsLog1, newdata = SongsTest, type = "response")
+#create a confusion matrix with a threshold of 0.45 
+table(SongsTest$Top10, SongsTestPred >= 0.45)
+#accuracy
+(309+15)/(309+5+44+15)
+# accuracy of the baseline model be on the test set(an easier model would be to pick the most frequent outcome (a song is not a Top 10 hit) for all songs.) 
+table(SongsTest$Top10)
+#accuracy
+314/(314+59)
+#True Positive Rate of model on the test set, using a threshold of 0.45
+15/(15+44)
+# False Positive Rate of model on the test set, using a threshold of 0.45?
+5/(309+5)
+```
+
