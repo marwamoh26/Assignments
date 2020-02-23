@@ -1,0 +1,137 @@
+---
+title: "Baseball"
+author: "Marwa Mohamed"
+date: "2/23/2020"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# load needed packages and install them if they do not exist
+easypackages::packages("tidyverse", prompt = F)
+```
+
+## R Markdown
+Investigate how well we can predict the World Series winner at the beginning of the playoffs.
+
+## Load data
+```{r}
+baseballTeams = read_csv("data/baseball.csv")
+#dataset structure
+str(baseballTeams)
+#identify the total number of years included in this dataset.
+table(baseballTeams$Year)
+
+```
+
+## Playoffs teams
+
+```{r}
+# a data frame limited to teams that made the playoffs 
+baseball = subset(baseballTeams, Playoffs == 1)
+#dataset structure
+str(baseball)
+#the number of teams making the playoffs in some season
+PlayoffTable = table(baseball$Year)
+PlayoffTable
+#to get the names of the PlayoffTable vector
+str(names(PlayoffTable))
+#returns the number of playoff teams in 1990 and 2001
+PlayoffTable[c("1990", "2001")]
+#Store the number of teams in the playoffs for each team/year pair in the dataset
+baseball$NumCompetitors = PlayoffTable[as.character(baseball$Year)]
+str(baseball$NumCompetitors)
+#the number of playoff team/year pairs are there in dataset from years where 8 teams were invited to the playoffs
+baseball %>% 
+  filter(NumCompetitors == 8) %>% 
+  nrow()
+```
+
+## Bivariate Models for Predicting World Series Winner
+```{r}
+# whether a team won the World Series in the indicated year  (1 won, 0 otherwise)
+baseball$WorldSeries = as.numeric(baseball$RankPlayoffs == 1)
+#the number of teams that did NOT win the World Series
+baseball %>% 
+  filter(WorldSeries == 0) %>% 
+  nrow()
+
+```
+Find variables that is a significant predictor of the WorldSeries variable in a bivariate logistic regression model( build 12 models)
+```{r}
+# year model
+modyear = glm(WorldSeries ~ Year, data = baseball, family = binomial)
+summary(modyear)
+# RS model
+modRS = glm(WorldSeries ~ RS, data = baseball, family = binomial)
+summary(modRS)
+# RA model
+modRA = glm(WorldSeries ~ RA, data = baseball, family = binomial)
+summary(modRA)
+# W model
+modW = glm(WorldSeries ~ W, data = baseball, family = binomial)
+summary(modW)
+# OBP model
+modOBP = glm(WorldSeries ~ OBP, data = baseball, family = binomial)
+summary(modOBP)
+# SLG model
+modSLG = glm(WorldSeries ~ SLG, data = baseball, family = binomial)
+summary(modSLG)
+# BA model
+modBA = glm(WorldSeries ~ BA, data = baseball, family = binomial)
+summary(modBA)
+# RankSeason model
+modRankSeason = glm(WorldSeries ~ RankSeason, data = baseball, family = binomial)
+summary(modRankSeason)
+# OOBP model
+modOOBP = glm(WorldSeries ~ OOBP, data = baseball, family = binomial)
+summary(modOOBP)
+# OSLG model
+modOSLG = glm(WorldSeries ~ OSLG, data = baseball, family = binomial)
+summary(modOSLG)
+# NumCompetitors model
+modNumCompetitors = glm(WorldSeries ~ NumCompetitors, data = baseball, family = binomial)
+#AIC 230.96
+summary(modNumCompetitors)
+# League model
+modLeague = glm(WorldSeries ~ League, data = baseball, family = binomial)
+summary(modLeague)
+
+```
+## Multivariate Models for Predicting World Series Winner
+combine the variables found to be significant in bivariate models. Build a model using all of the variables that  found to be significant in the bivariate models
+```{r}
+mod = glm(WorldSeries ~ Year + RA + RankSeason + NumCompetitors, data = baseball, family = binomial)
+summary(mod)
+#correlation of significant vars
+cor(baseball[,c(3,5,11,16)])
+
+```
+
+```{r}
+#Year/RA model
+mod1 = glm(WorldSeries ~ Year + RA, data = baseball, family = binomial)
+summary(mod1)
+
+#Year/RankSeason model
+mod2 = glm(WorldSeries ~ Year + RankSeason, data = baseball, family = binomial)
+summary(mod2)
+
+#Year/NumCompetitors model
+mod3 = glm(WorldSeries ~ Year + NumCompetitors, data = baseball, family = binomial)
+summary(mod3)
+
+#RA/RankSeason model
+mod4 = glm(WorldSeries ~ RankSeason + RA, data = baseball, family = binomial)
+summary(mod4)
+
+#NumCompetitors/RA model
+mod5 = glm(WorldSeries ~ NumCompetitors + RA, data = baseball, family = binomial)
+summary(mod5)
+
+#RankSeason/NumCompetitors model
+mod6 = glm(WorldSeries ~ RankSeason + NumCompetitors, data = baseball, family = binomial)
+summary(mod6)
+```
+
+
