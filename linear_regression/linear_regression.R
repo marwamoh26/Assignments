@@ -127,6 +127,19 @@ confint(sat.mod)
 
 par(mar = c(4, 4, 2, 2), mfrow = c(1, 2)) #optional
 ####don't understand the p;ot result ?????????????
+## As you are a normal human, it is a normal questions :D.
+## These plots are analysis tools to check if your model is right or there is 
+## something wrong. A detailed explanation about these plots is here:
+## http://www.contrib.andrew.cmu.edu/~achoulde/94842/homework/regression_diagnostics.html
+## https://data.library.virginia.edu/diagnostic-plots/
+## http://www.sthda.com/english/wiki/qq-plots-quantile-quantile-plots-r-base-graphs
+## https://data.library.virginia.edu/understanding-q-q-plots/
+## https://www.dummies.com/programming/r/how-to-use-quantile-plots-to-check-data-normality-in-r/
+## https://online.stat.psu.edu/stat462/node/117/
+## https://medium.com/data-distilled/residual-plots-part-1-residuals-vs-fitted-plot-f069849616b1
+## https://stats.stackexchange.com/questions/76226/interpreting-the-residuals-vs-fitted-values-plot-for-verifying-the-assumptions
+## http://docs.statwing.com/interpreting-residual-plots-to-improve-your-regression/
+## 
 plot(sat.mod, which = c(1, 2)) # "which" argument optional
 
 ## Comparing models
