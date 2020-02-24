@@ -214,7 +214,7 @@ plot(energyModel2)
 
   #Add the interaction to the model
 sat.expense.by.percent <- lm(csat ~ expense*income,
-                             data=states.data) 
+                             data = states.data) 
 #Show the results
   coef(summary(sat.expense.by.percent)) # show regression coefficients table
 
@@ -228,6 +228,14 @@ sat.expense.by.percent <- lm(csat ~ expense*income,
 # make sure R knows region is categorical
 str(states.data$region)
 # what changed in region ???????????????????????????????????????????????
+## Oh, alot.  Now we do not consider region a numeric field but a categorical 
+## field. That means we will do categorical statical analysis which is different
+## totally from numerical analysis, see here:
+## http://www.sthda.com/english/articles/40-regression-analysis/163-regression-with-categorical-variables-dummy-coding-essentials-in-r/
+## https://psu-psychology.github.io/r-bootcamp-2018/talks/anova_categorical.html
+## https://www.guru99.com/r-factor-categorical-continuous.html
+## https://support.minitab.com/en-us/minitab-express/1/help-and-how-to/modeling-statistics/regression/supporting-topics/basics/what-are-categorical-discrete-and-continuous-variables/
+## https://www.researchgate.net/post/Which_statistical_test_will_be_the_most_appropriate_to_find_association_between_a_numerical_variable_and_a_categorical_variable
 states.data$region <- factor(states.data$region)
 #Add region to the model
 sat.region <- lm(csat ~ region,
