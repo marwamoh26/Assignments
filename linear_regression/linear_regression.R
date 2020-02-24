@@ -180,6 +180,7 @@ plot(states.data$energy,states.data$metro)
 energyModel <- lm(energy ~ metro, data = states.data)
 summary(energyModel)
 ##   3. `plot' the model to look for deviations from modeling assumptions  ??????????????????????????????
+## Refer to above answer :)
 plot(energyModel)
 ##   Select one or more additional predictors to add to your model and
 ##   repeat steps 1-3. Is this model significantly better than the model
@@ -188,6 +189,13 @@ plot(energyModel)
 plot(states.data$energy,states.data$green)
 ##   2. Print and interpret the model `summary'
 #  why when removing insignificant vars R-squared decrease????????????????????????????????
+## Removing any variable from the model will affect it somehow and it is both 
+## statistical and business decision
+## A detailed answer is here:
+## https://stats.stackexchange.com/questions/413606/when-to-remove-insignificant-variables
+## https://www.theanalysisfactor.com/insignificant-effects-in-model/
+## https://www.quora.com/In-laymans-terms-why-is-dropping-insignificant-predictors-from-a-regression-model-a-bad-idea
+## https://www.statalist.org/forums/forum/general-stata-discussion/general/1489842-removing-insignificant-variables
 energyModel2 <- lm(energy ~ metro + green + toxic, data = states.data)
 summary(energyModel2)
 ##   3. `plot' the model to look for deviations from modeling assumptions
