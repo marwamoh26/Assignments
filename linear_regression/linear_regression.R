@@ -132,6 +132,7 @@ par(mar = c(4, 4, 2, 2), mfrow = c(1, 2)) #optional
 ## something wrong. A detailed explanation about these plots is here:
 ## http://www.contrib.andrew.cmu.edu/~achoulde/94842/homework/regression_diagnostics.html
 ## https://data.library.virginia.edu/diagnostic-plots/
+## https://www.theanalysisfactor.com/linear-models-r-diagnosing-regression-model/
 ## http://www.sthda.com/english/wiki/qq-plots-quantile-quantile-plots-r-base-graphs
 ## https://data.library.virginia.edu/understanding-q-q-plots/
 ## https://www.dummies.com/programming/r/how-to-use-quantile-plots-to-check-data-normality-in-r/
@@ -151,9 +152,19 @@ plot(sat.mod, which = c(1, 2)) # "which" argument optional
 # fit another model, adding house and senate as predictors
 sat.voting.mod <-  lm(csat ~ expense + house + senate,
                       data = na.omit(states.data))
-sat.mod <- update(sat.mod, data=na.omit(states.data))
+sat.mod <- update(sat.mod, data = na.omit(states.data))
 # compare using the anova() function
 # don't understand the output ????????????????????????????????????????????????
+## ANOVA or Analysis of Variance, is a very effiecient way to compare between
+## two models. It is a statistical method and an important topic to understand.
+## Kindly check:
+## https://www.statisticshowto.datasciencecentral.com/probability-and-statistics/hypothesis-testing/anova/
+## https://www.spss-tutorials.com/anova-what-is-it/
+## https://statistics.laerd.com/statistical-guides/one-way-anova-statistical-guide.php
+## https://www.guru99.com/r-anova-tutorial.html
+## http://www.sthda.com/english/wiki/one-way-anova-test-in-r
+## https://www.statmethods.net/stats/anova.html
+## http://homepages.inf.ed.ac.uk/bwebb/statistics/ANOVA_in_R.pdf
 anova(sat.mod, sat.voting.mod) 
 coef(summary(sat.voting.mod))
 
