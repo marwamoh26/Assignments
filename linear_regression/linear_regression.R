@@ -76,7 +76,7 @@ plot(sts.ex.sat)
 
 # Fit our regression model
 sat.mod <- lm(csat ~ expense, # regression formula
-              data=states.data) # data set
+              data = states.data) # data set
 # Summarize and print the results
 summary(sat.mod) # show regression coefficients table
 
@@ -97,7 +97,8 @@ summary(lm(csat ~ expense + percent, data = states.data))
 
 ##   OK, we fit our model. Now what?
 ##   • Examine the model object:                             ???????????????????
-
+## Examining model object here is just exploring what fields/attributes 
+## inside it for later uasage
 class(sat.mod)
 names(sat.mod)
 methods(class = class(sat.mod))[1:9]
