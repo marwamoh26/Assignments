@@ -30,9 +30,15 @@ list.files("dataSets") # files in the dataSets folder
 ## ────────────────────────
 
 # read the states data
-states.data <- readRDS("linear_regression/dataSets/states.rds") 
+states.data <- readRDS("linear_regression/dataSets/states.rds")
 str(states.data)
-#get labels ?????????????????????????????????????????
+# get labels ?????????????????????????????????????????
+# There is feature called attributes in R, it is like properties for dataframe
+# beside the columns like length, names, etc...
+# You can consider it as a metadate for the dataframe and here he is using
+# two of these meta data and make of them a seprate dataframe.
+#You can find more info about that here:
+# http://uc-r.github.io/dataframes_attributes
 states.info <- data.frame(attributes(states.data)[c("names", "var.labels")])
 str(states.info)
 #look at last few labels
