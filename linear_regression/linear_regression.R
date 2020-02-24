@@ -39,7 +39,8 @@ str(states.data)
 # two of these meta data and make of them a seprate dataframe.
 #You can find more info about that here:
 # http://uc-r.github.io/dataframes_attributes
-states.info <- data.frame(attributes(states.data)[c("names", "var.labels")])
+states.info <-
+  data.frame(attributes(states.data)[c("names", "var.labels")])
 str(states.info)
 #look at last few labels
 tail(states.info, 8)
@@ -97,7 +98,7 @@ summary(lm(csat ~ expense + percent, data = states.data))
 
 ##   OK, we fit our model. Now what?
 ##   • Examine the model object:                             ???????????????????
-## Examining model object here is just exploring what fields/attributes 
+## Examining model object here is just exploring what fields/attributes
 ## inside it for later uasage
 class(sat.mod)
 names(sat.mod)
@@ -106,7 +107,7 @@ methods(class = class(sat.mod))[1:9]
 ##   • Use function methods to get more information about the fit
 ### what is 2.5% values and 97.5% values ????????????
 ## If you remember in the statistics course, these are the limits of the famous
-## bell shape and it shows here how much condifent we are within those limits 
+## bell shape and it shows here how much condifent we are within those limits
 ## (hypothesis test).
 ## a quick refresher and more information here:
 ## ?confint (r help) and here:
@@ -128,7 +129,7 @@ confint(sat.mod)
 par(mar = c(4, 4, 2, 2), mfrow = c(1, 2)) #optional
 ####don't understand the p;ot result ?????????????
 ## As you are a normal human, it is a normal questions :D.
-## These plots are analysis tools to check if your model is right or there is 
+## These plots are analysis tools to check if your model is right or there is
 ## something wrong. A detailed explanation about these plots is here:
 ## http://www.contrib.andrew.cmu.edu/~achoulde/94842/homework/regression_diagnostics.html
 ## https://data.library.virginia.edu/diagnostic-plots/
@@ -140,7 +141,7 @@ par(mar = c(4, 4, 2, 2), mfrow = c(1, 2)) #optional
 ## https://medium.com/data-distilled/residual-plots-part-1-residuals-vs-fitted-plot-f069849616b1
 ## https://stats.stackexchange.com/questions/76226/interpreting-the-residuals-vs-fitted-values-plot-for-verifying-the-assumptions
 ## http://docs.statwing.com/interpreting-residual-plots-to-improve-your-regression/
-## 
+##
 plot(sat.mod, which = c(1, 2)) # "which" argument optional
 
 ## Comparing models
@@ -165,7 +166,7 @@ sat.mod <- update(sat.mod, data = na.omit(states.data))
 ## http://www.sthda.com/english/wiki/one-way-anova-test-in-r
 ## https://www.statmethods.net/stats/anova.html
 ## http://homepages.inf.ed.ac.uk/bwebb/statistics/ANOVA_in_R.pdf
-anova(sat.mod, sat.voting.mod) 
+anova(sat.mod, sat.voting.mod)
 coef(summary(sat.voting.mod))
 
 ## Exercise: least squares regression
@@ -175,7 +176,7 @@ coef(summary(sat.voting.mod))
 ##   per capita (energy) from the percentage of residents living in
 ##   metropolitan areas (metro). Be sure to
 ##   1. Examine/plot the data before fitting the model
-plot(states.data$energy,states.data$metro)
+plot(states.data$energy, states.data$metro)
 ##   2. Print and interpret the model `summary'
 energyModel <- lm(energy ~ metro, data = states.data)
 summary(energyModel)
@@ -186,17 +187,18 @@ plot(energyModel)
 ##   repeat steps 1-3. Is this model significantly better than the model
 ##   with /metro/ as the only predictor?
 ##   1. Examine/plot the data before fitting the model
-plot(states.data$energy,states.data$green)
+plot(states.data$energy, states.data$green)
 ##   2. Print and interpret the model `summary'
 #  why when removing insignificant vars R-squared decrease????????????????????????????????
-## Removing any variable from the model will affect it somehow and it is both 
+## Removing any variable from the model will affect it somehow and it is both
 ## statistical and business decision
 ## A detailed answer is here:
 ## https://stats.stackexchange.com/questions/413606/when-to-remove-insignificant-variables
 ## https://www.theanalysisfactor.com/insignificant-effects-in-model/
 ## https://www.quora.com/In-laymans-terms-why-is-dropping-insignificant-predictors-from-a-regression-model-a-bad-idea
 ## https://www.statalist.org/forums/forum/general-stata-discussion/general/1489842-removing-insignificant-variables
-energyModel2 <- lm(energy ~ metro + green + toxic, data = states.data)
+energyModel2 <-
+  lm(energy ~ metro + green + toxic, data = states.data)
 summary(energyModel2)
 ##   3. `plot' the model to look for deviations from modeling assumptions
 plot(energyModel2)
@@ -212,11 +214,11 @@ plot(energyModel2)
 ##   For example: Does the association between expense and SAT scores
 ##   depend on the median income in the state?
 
-  #Add the interaction to the model
-sat.expense.by.percent <- lm(csat ~ expense*income,
-                             data = states.data) 
+#Add the interaction to the model
+sat.expense.by.percent <- lm(csat ~ expense * income,
+                             data = states.data)
 #Show the results
-  coef(summary(sat.expense.by.percent)) # show regression coefficients table
+coef(summary(sat.expense.by.percent)) # show regression coefficients table
 
 ## Regression with categorical predictors
 ## ──────────────────────────────────────────
@@ -228,7 +230,7 @@ sat.expense.by.percent <- lm(csat ~ expense*income,
 # make sure R knows region is categorical
 str(states.data$region)
 # what changed in region ???????????????????????????????????????????????
-## Oh, alot.  Now we do not consider region a numeric field but a categorical 
+## Oh, alot.  Now we do not consider region a numeric field but a categorical
 ## field. That means we will do categorical statical analysis which is different
 ## totally from numerical analysis, see here:
 ## http://www.sthda.com/english/articles/40-regression-analysis/163-regression-with-categorical-variables-dummy-coding-essentials-in-r/
@@ -239,7 +241,7 @@ str(states.data$region)
 states.data$region <- factor(states.data$region)
 #Add region to the model
 sat.region <- lm(csat ~ region,
-                 data=states.data) 
+                 data = states.data)
 #Show the results
 coef(summary(sat.region)) # show regression coefficients table
 anova(sat.region) # show ANOVA table
@@ -254,16 +256,27 @@ anova(sat.region) # show ANOVA table
 ##   default in R is treatment contrasts, with the first level as the
 ##   reference. We can change the reference group or use another coding
 ##   scheme using the `C' function.????????????????????????????????????????????????????????????????????
+### It is just another way of coding, you will find your answer in the links in
+### previous question
 
 # print default contrasts???????????????
 contrasts(states.data$region)
 # change the reference group?????????????????
-coef(summary(lm(csat ~ C(region, base=4),
-                data=states.data)))
+coef(summary(lm(csat ~ C(region, base = 4),
+                data = states.data)))
 # change the coding scheme???????????????????
-coef(summary(lm(csat ~ C(region, contr.helmert),
-                data=states.data)))
+coef(summary(lm(csat ~ C(
+  region, contr.helmert
+),
+data = states.data)))
 
+### ok, it is a compsite thing:
+### 1. You can think of it as priority (which is the most important factor level
+### to take into consideration)
+### 2. Coding schema is just another way of representation/interpretation
+### https://rcompanion.org/rcompanion/h_01.html
+### https://faculty.nps.edu/sebuttre/home/R/contrasts.html
+### https://rstudio-pubs-static.s3.amazonaws.com/65059_586f394d8eb84f84b1baaf56ffb6b47f.html
 ##   See also `?contrasts', `?contr.treatment', and `?relevel'.
 
 ## Exercise: interactions and factors
@@ -277,12 +290,18 @@ coef(summary(lm(csat ~ C(region, contr.helmert),
 #energyModel2 <- lm(energy ~ metro + green + toxic, data = states.data)
 
 x <- coef(energyModel2)
-y <- x[1] + x[2] * states.data$metro + x[3] * states.data$green + x[4] * states.data$toxic + 
-  x[2] * x[3] * states.data$metro *states.data$green + x[2] * x[4] * states.data$metro * states.data$toxic + 
-  x[3] * x[4] * states.data$green * states.data$toxic + x[2] * x[3] * x[4] * states.data$metro *states.data$green * states.data$toxic
+y <- x[1] + x[2] * states.data$metro + x[3] * states.data$green +
+  x[4] * states.data$toxic +
+  x[2] * x[3] * states.data$metro * states.data$green +
+  x[2] * x[4] * states.data$metro * states.data$toxic +
+  x[3] * x[4] * states.data$green * states.data$toxic +
+  x[2] * x[3] * x[4] * states.data$metro * states.data$green * states.data$toxic
 
 ##   2. Try adding region to the model. Are there significant differences
 ##      across the four regions?
 # only 3 regions appear ??????????????????
-energyModel3 <- lm(energy ~ metro + green + toxic + region, data = states.data)
+### yeah as they are the most important, I hope the above links will clarify
+## that more
+energyModel3 <-
+  lm(energy ~ metro + green + toxic + region, data = states.data)
 summary(energyModel3)
