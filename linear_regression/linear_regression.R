@@ -105,6 +105,13 @@ methods(class = class(sat.mod))[1:9]
 
 ##   • Use function methods to get more information about the fit
 ### what is 2.5% values and 97.5% values ????????????
+## If you remember in the statistics course, these are the limits of the famous
+## bell shape and it shows here how much condifent we are within those limits 
+## (hypothesis test).
+## a quick refresher and more information here:
+## ?confint (r help) and here:
+## https://www.econometrics-with-r.org/5-3-rwxiabv.html
+## https://www.statisticshowto.datasciencecentral.com/probability-and-statistics/hypothesis-testing/
 confint(sat.mod)
 # hist(residuals(sat.mod))
 
