@@ -106,7 +106,10 @@ everwrkMod = glm(everwrk ~ age_p + r_maritl, data = NH11, family = binomial)
 summary(everwrkMod)
 #clean data
 NH11$r_maritl <- factor(NH11$r_maritl, 
-                        levels= gsub("r_maritl","",variable.names(everwrkMod)[3:length(coef(everwrkMod))]))
+                        levels = gsub("r_maritl",
+                                     "",
+                                     variable.names(everwrkMod)
+                                     [3:length(coef(everwrkMod))]))
 table(NH11$r_maritl)
 
 ##   2. Predict the probability of working for each level of marital
@@ -117,7 +120,7 @@ predDat1 <- with(NH11,
                             age_p = mean(age_p, na.rm = TRUE)))
 
 cbind(predDat1, predict(everwrkMod, type = "response",
-                        se.fit = TRUE, interval="confidence",
+                        se.fit = TRUE, interval = "confidence",
                         newdata = predDat1))
 ##   Note that the data is not perfectly clean and ready to be modeled. You
 ##   will need to clean up at least some of the variables before fitting
